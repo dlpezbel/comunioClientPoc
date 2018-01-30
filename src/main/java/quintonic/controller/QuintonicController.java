@@ -6,9 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import quintonic.dto.MarketDTO;
-import quintonic.dto.PlayerDataDTO;
-import quintonic.dto.UserDTO;
+import quintonic.dto.*;
 import quintonic.service.BiwengerClientService;
 import quintonic.service.QuintonicService;
 
@@ -44,8 +42,14 @@ public class QuintonicController {
 
     @RequestMapping("/user/login")
     @ResponseBody
-    void login(@RequestBody UserDTO userDTO) {
-        biwengerClientService.login(userDTO);
+    TokenDTO login(@RequestBody UserDTO userDTO) {
+        return biwengerClientService.login(userDTO);
+    }
+
+    @RequestMapping("/user/account")
+    @ResponseBody
+    AccountDataDTO getUserAccount(@RequestHeader(value="Authorization") String bearer) {
+        return biwengerClientService.getUserAccount(bearer);
     }
 
 }

@@ -43,7 +43,7 @@ public class BiwengerClientServiceImpl implements BiwengerClientService {
     public TokenDTO login(UserDTO userDTO) {
         final String uri = "https://biwenger.as.com/api/v1/auth/login";
         RestTemplate restTemplate = getRestTemplate();
-        HttpEntity<UserDTO> request = new HttpEntity<>(new UserDTO("dlpezbel@yahoo.es","abcd0090"));
+        HttpEntity<UserDTO> request = new HttpEntity<>(new UserDTO(userDTO.getEmail(),userDTO.getPassword()));
 
         TokenDTO tokenDTO = restTemplate.postForObject(uri,request,TokenDTO.class);
         System.out.println(tokenDTO);
@@ -84,8 +84,6 @@ public class BiwengerClientServiceImpl implements BiwengerClientService {
         final String uri = "https://biwenger.as.com/api/v1/user?fields=*,players(*,fitness)";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        //TokenDTO tokenDTO = login(null);
-        //String accessToken = tokenDTO.getToken();
 
         headers.set("Authorization", bearer);
         headers.set("X-League", league);
@@ -99,5 +97,24 @@ public class BiwengerClientServiceImpl implements BiwengerClientService {
 
         List<PlayerDataDTO> playerDataDTOList = userDataDTO.getData().getPlayers();
         return playerDataDTOList;
+    }
+
+    public AccountDataDTO getUserAccount(String bearer) {
+        final String uri = "https://biwenger.as.com/api/v1/account";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        headers.set("Authorization", bearer);
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<AccountDTO> result = getRestTemplate().exchange(uri, HttpMethod.GET, entity, AccountDTO.class);
+
+        AccountDTO accountDTO = result.getBody();
+
+        System.out.println("team user: " + accountDTO);
+
+        AccountDataDTO accountDataDTO = accountDTO.getData();
+        return accountDataDTO;
+
     }
 }
