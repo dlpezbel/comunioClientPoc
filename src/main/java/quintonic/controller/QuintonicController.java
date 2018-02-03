@@ -60,8 +60,7 @@ public class QuintonicController {
         MarketDTO marketDTO = biwengerClientService.getMarket(bearer, league);
         List<PlayerDataDTO> playerDataDTOList = new ArrayList<>();
         marketDTO.getData().getSales().stream().forEach(saleDTO -> playerDataDTOList.add(saleDTO.getPlayer()));
-        quintonicService.fillPlayerScoresForBot(playerDataDTOList);
-        return playerDataDTOList;
+        return quintonicService.fillPlayerScoresForBot(playerDataDTOList);
     }
 
 }
