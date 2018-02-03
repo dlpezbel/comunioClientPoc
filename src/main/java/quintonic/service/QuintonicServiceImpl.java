@@ -105,22 +105,30 @@ public class QuintonicServiceImpl implements QuintonicService{
                 System.out.println(player.getName() + ": injured player!!");
                 player.setRecommendedAction("Not buy, injured");
             } else {
+                PlayerDataDTO newPlayer = new PlayerDataDTO();
                 double finalScore = (player.getAverageFitnessScore() +
                         player.getAveragePriceScore() +
                         player.getPriceIndicatorScore() +
                         player.getMatchesPlayedScore()) / 4;
                 player.setScore(finalScore);
+                newPlayer.setScore(finalScore);
+                newPlayer.setName(player.getName());
+                newPlayer.setPrice(player.getPrice());
+
                 if (finalScore < 0.25){
                     player.setRecommendedAction("Not buy!!!");
+                    newPlayer.setRecommendedAction("Not buy!!!");
                 } else if (finalScore < 0.5){
                     player.setRecommendedAction("Not Buy");
+                    newPlayer.setRecommendedAction("Not buy!!!");
                 } else if (finalScore <= 0.75){
                     player.setRecommendedAction("Evaluate");
-                    result.add(player);
+                    newPlayer.setRecommendedAction("Not buy!!!");
                 } else if (finalScore > 0.75){
                     player.setRecommendedAction("Buy!!!");
-                    result.add(player);
+                    newPlayer.setRecommendedAction("Not buy!!!");
                 }
+                result.add(player);
             }
         });
         return result;
