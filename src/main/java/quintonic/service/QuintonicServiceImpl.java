@@ -128,7 +128,7 @@ public class QuintonicServiceImpl implements QuintonicService{
                     player.setRecommendedAction("Buy!!!");
                     newPlayer.setRecommendedAction("Not buy!!!");
                 }
-                result.add(player);
+                result.add(newPlayer);
             }
         });
         return result;
