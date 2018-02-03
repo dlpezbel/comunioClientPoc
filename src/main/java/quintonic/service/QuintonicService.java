@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface QuintonicService {
     void fillPlayerScores(List<PlayerDataDTO> playerDataDTOList);
+
+    List<PlayerDataDTO> fillPlayerScoresForBot(List<PlayerDataDTO> playerDataDTOList);
 }

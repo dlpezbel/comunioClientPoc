@@ -52,4 +52,16 @@ public class QuintonicController {
         return biwengerClientService.getUserAccount(bearer);
     }
 
+
+    @RequestMapping("/marketbot")
+    @ResponseBody
+    List<PlayerDataDTO> getMarketScoreBot(@RequestHeader(value="Authorization") String bearer,
+                                       @RequestHeader(value="X-League") String league) {
+        MarketDTO marketDTO = biwengerClientService.getMarket(bearer, league);
+        List<PlayerDataDTO> playerDataDTOList = new ArrayList<>();
+        marketDTO.getData().getSales().stream().forEach(saleDTO -> playerDataDTOList.add(saleDTO.getPlayer()));
+        quintonicService.fillPlayerScoresForBot(playerDataDTOList);
+        return playerDataDTOList;
+    }
+
 }

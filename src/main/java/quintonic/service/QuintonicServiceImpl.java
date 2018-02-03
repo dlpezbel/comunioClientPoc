@@ -10,6 +10,7 @@ import quintonic.engine.player.EngineCalculateAveragePriceScore;
 import quintonic.engine.player.EngineCalculateMatchesPlayedScore;
 import quintonic.engine.player.EngineCalculatePriceIndicatorScore;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -75,5 +76,53 @@ public class QuintonicServiceImpl implements QuintonicService{
                 }
             }
         });
+    }
+
+    public List<PlayerDataDTO> fillPlayerScoresForBot(List<PlayerDataDTO> playerDataDTOList) {
+        List<PlayerDataDTO> result = new ArrayList<>();
+        playerDataDTOList.stream().forEach(player -> {
+            Double averageFitnessScore = engineCalculateAverageFitnessScore.getScore(player);
+            player.setAverageFitnessScore(averageFitnessScore);
+        });
+
+        playerDataDTOList.stream().forEach(player -> {
+            Double averagePriceScore = engineCalculateAveragePriceScore.getScore(player);
+            player.setAveragePriceScore(averagePriceScore);
+        });
+
+        playerDataDTOList.stream().forEach(player -> {
+            Double priceIndicatorScore = engineCalculatePriceIndicatorScore.getScore(player);
+            player.setPriceIndicatorScore(priceIndicatorScore);
+        });
+
+        playerDataDTOList.stream().forEach(player -> {
+            Double matchesPlayedScore = engineCalculateMatchesPlayedScore.getScore(player);
+            player.setMatchesPlayedScore(matchesPlayedScore);
+        });
+
+        playerDataDTOList.stream().forEach(player -> {
+            if ("injured".equals(player.getFitness().get(0))) {
+                System.out.println(player.getName() + ": injured player!!");
+                player.setRecommendedAction("Not buy, injured");
+            } else {
+                double finalScore = (player.getAverageFitnessScore() +
+                        player.getAveragePriceScore() +
+                        player.getPriceIndicatorScore() +
+                        player.getMatchesPlayedScore()) / 4;
+                player.setScore(finalScore);
+                if (finalScore < 0.25){
+                    player.setRecommendedAction("Not buy!!!");
+                } else if (finalScore < 0.5){
+                    player.setRecommendedAction("Not Buy");
+                } else if (finalScore <= 0.75){
+                    player.setRecommendedAction("Evaluate");
+                    result.add(player);
+                } else if (finalScore > 0.75){
+                    player.setRecommendedAction("Buy!!!");
+                    result.add(player);
+                }
+            }
+        });
+        return result;
     }
 }
