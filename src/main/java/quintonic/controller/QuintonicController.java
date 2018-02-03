@@ -55,7 +55,7 @@ public class QuintonicController {
 
     @RequestMapping("/marketbot")
     @ResponseBody
-    List<PlayerDataDTO> getMarketScoreBot(@RequestHeader(value="Authorization") String bearer,
+    List<SimplePlayerDataDTO> getMarketScoreBot(@RequestHeader(value="Authorization") String bearer,
                                        @RequestHeader(value="X-League") String league) {
         MarketDTO marketDTO = biwengerClientService.getMarket(bearer, league);
         List<PlayerDataDTO> playerDataDTOList = new ArrayList<>();

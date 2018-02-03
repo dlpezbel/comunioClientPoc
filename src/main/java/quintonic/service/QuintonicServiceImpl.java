@@ -3,6 +3,7 @@ package quintonic.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import quintonic.dto.PlayerDataDTO;
+import quintonic.dto.SimplePlayerDataDTO;
 import quintonic.engine.market.EngineAveragePricePerPosition;
 import quintonic.engine.market.EngineCalculateAveragePricePerPosition;
 import quintonic.engine.player.EngineCalculateAverageFitnessScore;
@@ -78,8 +79,8 @@ public class QuintonicServiceImpl implements QuintonicService{
         });
     }
 
-    public List<PlayerDataDTO> fillPlayerScoresForBot(List<PlayerDataDTO> playerDataDTOList) {
-        List<PlayerDataDTO> result = new ArrayList<>();
+    public List<SimplePlayerDataDTO> fillPlayerScoresForBot(List<PlayerDataDTO> playerDataDTOList) {
+        List<SimplePlayerDataDTO> result = new ArrayList<>();
         playerDataDTOList.stream().forEach(player -> {
             Double averageFitnessScore = engineCalculateAverageFitnessScore.getScore(player);
             player.setAverageFitnessScore(averageFitnessScore);
@@ -105,7 +106,7 @@ public class QuintonicServiceImpl implements QuintonicService{
                 System.out.println(player.getName() + ": injured player!!");
                 player.setRecommendedAction("Not buy, injured");
             } else {
-                PlayerDataDTO newPlayer = new PlayerDataDTO();
+                SimplePlayerDataDTO newPlayer = new SimplePlayerDataDTO();
                 double finalScore = (player.getAverageFitnessScore() +
                         player.getAveragePriceScore() +
                         player.getPriceIndicatorScore() +
