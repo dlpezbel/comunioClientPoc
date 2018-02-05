@@ -124,10 +124,10 @@ public class QuintonicServiceImpl implements QuintonicService{
                     newPlayer.setRecommendedAction("Not buy!!!");
                 } else if (finalScore <= 0.75){
                     player.setRecommendedAction("Evaluate");
-                    newPlayer.setRecommendedAction("Not buy!!!");
+                    newPlayer.setRecommendedAction("Evaluate");
                 } else if (finalScore > 0.75){
                     player.setRecommendedAction("Buy!!!");
-                    newPlayer.setRecommendedAction("Not buy!!!");
+                    newPlayer.setRecommendedAction("Buy!!!");
                 }
                 result.add(newPlayer);
             }
