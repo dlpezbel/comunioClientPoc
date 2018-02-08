@@ -2,15 +2,13 @@ package quintonic.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
-@ToString
-public class SaleDTO {
+public class OwnerDTO {
     @Getter
     @Setter
-    PlayerDataDTO player;
+    int id;
 
     @Getter
     @Setter
-    OwnerDTO user;
+    String name;
 }
