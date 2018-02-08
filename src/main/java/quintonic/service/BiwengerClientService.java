@@ -16,4 +16,6 @@ public interface BiwengerClientService {
     List<PlayerDataDTO> getUserPlayers(String bearer, String league);
 
     AccountDataDTO getUserAccount(String bearer);
+
+    List<PlayerDataDTO> getPlayersByName(String name);
 }

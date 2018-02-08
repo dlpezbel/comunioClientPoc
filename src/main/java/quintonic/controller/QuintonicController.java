@@ -10,6 +10,8 @@ import quintonic.service.QuintonicService;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
 @Controller
 @CrossOrigin
 public class QuintonicController {
@@ -25,6 +27,15 @@ public class QuintonicController {
         MarketDTO marketDTO = biwengerClientService.getMarket(bearer, league);
         List<PlayerDataDTO> playerDataDTOList = new ArrayList<>();
         marketDTO.getData().getSales().stream().forEach(saleDTO -> playerDataDTOList.add(saleDTO.getPlayer()));
+        quintonicService.fillPlayerScores(playerDataDTOList);
+        return playerDataDTOList;
+    }
+
+    @RequestMapping( value = "/players",params = {"name"}, method = GET )
+    @ResponseBody
+    public List<PlayerDataDTO> getPlayersByName(
+            @RequestParam( "name" ) String name, @RequestParam( "size" ) int size){
+        List<PlayerDataDTO> playerDataDTOList = biwengerClientService.getPlayersByName(name);
         quintonicService.fillPlayerScores(playerDataDTOList);
         return playerDataDTOList;
     }

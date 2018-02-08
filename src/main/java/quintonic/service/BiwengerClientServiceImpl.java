@@ -56,8 +56,6 @@ public class BiwengerClientServiceImpl implements BiwengerClientService {
         final String uri = "https://biwenger.as.com/api/v1/market?&limit=100";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        //TokenDTO tokenDTO = login(null);
-        //String accessToken = tokenDTO.getToken();
 
         headers.set("Authorization", bearer);
         headers.set("X-League", league);
@@ -116,5 +114,15 @@ public class BiwengerClientServiceImpl implements BiwengerClientService {
         AccountDataDTO accountDataDTO = accountDTO.getData();
         return accountDataDTO;
 
+    }
+
+    @Override
+    public List<PlayerDataDTO> getPlayersByName(String name) {
+        final String uri = "https://biwenger.as.com/api/v1/players/la-liga?&q=" + name + "&limit=1000";
+
+        RestTemplate restTemplate = getRestTemplate();
+        PlayersDTO allPlayers = restTemplate.getForObject(uri, PlayersDTO.class);
+
+        return allPlayers.getData();
     }
 }
