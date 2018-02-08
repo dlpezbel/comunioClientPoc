@@ -20,10 +20,10 @@ public class QuintonicController {
     @Autowired
     QuintonicService quintonicService;
 
-    @RequestMapping("/market/players")
+    @RequestMapping("/league/{idLeague}/market/players")
     @ResponseBody
     List<PlayerDataDTO> getMarketScore(@RequestHeader(value="Authorization") String bearer,
-                                       @RequestHeader(value="X-League") String league) {
+                                       @PathVariable(value="idLeague") String league) {
         MarketDTO marketDTO = biwengerClientService.getMarket(bearer, league);
         List<PlayerDataDTO> playerDataDTOList = new ArrayList<>();
         marketDTO.getData().getSales().stream().forEach(saleDTO -> playerDataDTOList.add(saleDTO.getPlayer()));
