@@ -39,6 +39,10 @@ public class PlayerDataDTO {
     @Getter @Setter
     Integer pointsLastSeason;
     @Getter @Setter
+    String user;
+    @Getter @Setter
+    ClauseDTO owner;
+    @Getter @Setter
     Double averageFitnessScore;
     @Getter @Setter
     Double averagePriceScore;
@@ -50,6 +54,4 @@ public class PlayerDataDTO {
     Double score;
     @Getter @Setter
     String recommendedAction;
-    @Getter @Setter
-    String user;
 }
