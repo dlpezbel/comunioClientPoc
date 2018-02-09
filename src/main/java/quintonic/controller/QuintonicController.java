@@ -26,11 +26,7 @@ public class QuintonicController {
                                        @PathVariable(value="idLeague") String league) {
         MarketDTO marketDTO = biwengerClientService.getMarket(bearer, league);
         List<PlayerDataDTO> playerDataDTOList = new ArrayList<>();
-        marketDTO.getData().getSales().stream().forEach(saleDTO -> {
-            PlayerDataDTO playerDataDTO = saleDTO.getPlayer();
-            if (saleDTO.getUser()!=null)
-                playerDataDTO.setUser(saleDTO.getUser().getName());
-            playerDataDTOList.add(playerDataDTO);});
+        setResponsePlayersList(marketDTO, playerDataDTOList);
         quintonicService.fillPlayerScores(playerDataDTOList);
         return playerDataDTOList;
     }
@@ -72,12 +68,16 @@ public class QuintonicController {
                                        @RequestHeader(value="X-League") String league) {
         MarketDTO marketDTO = biwengerClientService.getMarket(bearer, league);
         List<PlayerDataDTO> playerDataDTOList = new ArrayList<>();
+        setResponsePlayersList(marketDTO, playerDataDTOList);
+        return quintonicService.fillPlayerScoresForBot(playerDataDTOList);
+    }
+
+    private void setResponsePlayersList(MarketDTO marketDTO, List<PlayerDataDTO> playerDataDTOList) {
         marketDTO.getData().getSales().stream().forEach(saleDTO -> {
             PlayerDataDTO playerDataDTO = saleDTO.getPlayer();
-            playerDataDTO.setUser(saleDTO.getUser().getName());
-            playerDataDTOList.add(playerDataDTO);
-        });
-        return quintonicService.fillPlayerScoresForBot(playerDataDTOList);
+            if (saleDTO.getUser()!=null)
+                playerDataDTO.setUser(saleDTO.getUser().getName());
+            playerDataDTOList.add(playerDataDTO);});
     }
 
 }
