@@ -23,6 +23,8 @@ public class PlayerDataDTO {
     @Getter @Setter
     Integer priceIncrement;
     @Getter @Setter
+    TeamDTO team;
+    @Getter @Setter
     List<String> fitness;
     @Getter @Setter
     Integer points;
