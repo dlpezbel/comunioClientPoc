@@ -2,8 +2,9 @@ package quintonic.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import quintonic.dto.MarketDTO;
 import quintonic.dto.PlayerDataDTO;
-import quintonic.dto.SimplePlayerDataDTO;
+import quintonic.dto.response.SimplePlayerDataResponseDTO;
 import quintonic.engine.market.EngineAveragePricePerPosition;
 import quintonic.engine.market.EngineCalculateAveragePricePerPosition;
 import quintonic.engine.player.EngineCalculateAverageFitnessScore;
@@ -34,6 +35,31 @@ public class QuintonicServiceImpl implements QuintonicService{
 
     @Autowired
     EngineCalculateMatchesPlayedScore engineCalculateMatchesPlayedScore;
+
+    @Autowired
+    BiwengerClientService biwengerClientService;
+
+    @Override
+    public List<PlayerDataDTO> getMarketScore(String bearer, String league) {
+        MarketDTO marketDTO = biwengerClientService.getMarket(bearer, league);
+        List<PlayerDataDTO> playerDataDTOList = getPlayerListFromMarket(marketDTO);
+        fillPlayerScores(playerDataDTOList);
+        return playerDataDTOList;
+    }
+
+    @Override
+    public List<PlayerDataDTO> getPlayersByName(String name) {
+        List<PlayerDataDTO> playerDataDTOList = biwengerClientService.getPlayersByName(name);
+        fillPlayerScores(playerDataDTOList);
+        return playerDataDTOList;
+    }
+
+    @Override
+    public List<PlayerDataDTO> getUserPlayerScore(String bearer, String league) {
+        List<PlayerDataDTO> playerDataDTOList = biwengerClientService.getUserPlayers(bearer, league);
+        fillPlayerScores(playerDataDTOList);
+        return playerDataDTOList;
+    }
 
     public void fillPlayerScores(List<PlayerDataDTO> playerDataDTOList) {
         playerDataDTOList.stream().forEach(player -> {
@@ -79,59 +105,11 @@ public class QuintonicServiceImpl implements QuintonicService{
         });
     }
 
-    public List<SimplePlayerDataDTO> fillPlayerScoresForBot(List<PlayerDataDTO> playerDataDTOList) {
-        List<SimplePlayerDataDTO> result = new ArrayList<>();
-        playerDataDTOList.stream().forEach(player -> {
-            Double averageFitnessScore = engineCalculateAverageFitnessScore.getScore(player);
-            player.setAverageFitnessScore(averageFitnessScore);
-        });
-
-        playerDataDTOList.stream().forEach(player -> {
-            Double averagePriceScore = engineCalculateAveragePriceScore.getScore(player);
-            player.setAveragePriceScore(averagePriceScore);
-        });
-
-        playerDataDTOList.stream().forEach(player -> {
-            Double priceIndicatorScore = engineCalculatePriceIndicatorScore.getScore(player);
-            player.setPriceIndicatorScore(priceIndicatorScore);
-        });
-
-        playerDataDTOList.stream().forEach(player -> {
-            Double matchesPlayedScore = engineCalculateMatchesPlayedScore.getScore(player);
-            player.setMatchesPlayedScore(matchesPlayedScore);
-        });
-
-        playerDataDTOList.stream().forEach(player -> {
-            if ("injured".equals(player.getFitness().get(0))) {
-                System.out.println(player.getName() + ": injured player!!");
-                player.setRecommendedAction("Not buy, injured");
-            } else {
-                SimplePlayerDataDTO newPlayer = new SimplePlayerDataDTO();
-                double finalScore = (player.getAverageFitnessScore() +
-                        player.getAveragePriceScore() +
-                        player.getPriceIndicatorScore() +
-                        player.getMatchesPlayedScore()) / 4;
-                player.setScore(finalScore);
-                newPlayer.setScore(finalScore);
-                newPlayer.setName(player.getName());
-                newPlayer.setPrice(player.getPrice());
-
-                if (finalScore < 0.25){
-                    player.setRecommendedAction("Not buy!!!");
-                    newPlayer.setRecommendedAction("Not buy!!!");
-                } else if (finalScore < 0.5){
-                    player.setRecommendedAction("Not Buy");
-                    newPlayer.setRecommendedAction("Not buy!!!");
-                } else if (finalScore <= 0.75){
-                    player.setRecommendedAction("Evaluate");
-                    newPlayer.setRecommendedAction("Evaluate");
-                } else if (finalScore > 0.75){
-                    player.setRecommendedAction("Buy!!!");
-                    newPlayer.setRecommendedAction("Buy!!!");
-                }
-                result.add(newPlayer);
-            }
-        });
-        return result;
+    private List<PlayerDataDTO> getPlayerListFromMarket(MarketDTO marketDTO) {
+        List<PlayerDataDTO> playerDataDTOList = new ArrayList<>();
+        marketDTO.getData().getSales().stream().forEach(saleDTO -> {
+            PlayerDataDTO playerDataDTO = saleDTO.getPlayer();
+            playerDataDTOList.add(playerDataDTO);});
+        return playerDataDTOList;
     }
 }
