@@ -1,14 +1,17 @@
-package quintonic.dto;
+package quintonic.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import quintonic.dto.ClauseDTO;
+import quintonic.dto.OwnerDTO;
+import quintonic.dto.TeamDTO;
+import quintonic.dto.UserDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 @ToString
-public class PlayerDataDTO {
+public class PlayerDataRequestDTO {
     @Getter @Setter
     String id;
     @Getter @Setter
@@ -40,19 +43,5 @@ public class PlayerDataDTO {
     @Getter @Setter
     Integer pointsLastSeason;
     @Getter @Setter
-    Optional<String> owner;
-    @Getter @Setter
-    Optional<Integer> clause;
-    @Getter @Setter
-    Double averageFitnessScore;
-    @Getter @Setter
-    Double averagePriceScore;
-    @Getter @Setter
-    Double priceIndicatorScore;
-    @Getter @Setter
-    Double matchesPlayedScore;
-    @Getter @Setter
-    Double score;
-    @Getter @Setter
-    String recommendedAction;
+    ClauseDTO owner;
 }

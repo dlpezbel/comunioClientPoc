@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import quintonic.dto.PlayerDataDTO;
+import quintonic.dto.request.PlayerDataRequestDTO;
 import quintonic.service.BiwengerClientService;
 
 import java.util.Calendar;
@@ -13,6 +14,10 @@ import java.util.List;
 
 @Component
 public class EngineAveragePricePerPosition {
+    public static final String GOALKEEPER = "1";
+    public static final String DEFENDER = "2";
+    public static final String MIDFIELD = "3";
+    public static final String FORWARDER = "4";
     @Getter @Setter
     Integer averagePricePerGoalkeeper;
     @Getter @Setter
@@ -35,21 +40,21 @@ public class EngineAveragePricePerPosition {
             date = new Date(System.currentTimeMillis());
             List<PlayerDataDTO> playerDataDTOList = biwengerClientService.getAllPlayers();
             this.setAveragePricePerGoalkeeper(
-                    engineCalculateAveragePricePerPosition.calculate(playerDataDTOList,"1"));
+                    engineCalculateAveragePricePerPosition.calculate(playerDataDTOList, GOALKEEPER));
             this.setAveragePricePerDefender(
-                    engineCalculateAveragePricePerPosition.calculate(playerDataDTOList,"2"));
+                    engineCalculateAveragePricePerPosition.calculate(playerDataDTOList, DEFENDER));
             this.setAveragePricePerMidfield(
-                    engineCalculateAveragePricePerPosition.calculate(playerDataDTOList,"3"));
+                    engineCalculateAveragePricePerPosition.calculate(playerDataDTOList, MIDFIELD));
             this.setAveragePricePerForwarder(
-                    engineCalculateAveragePricePerPosition.calculate(playerDataDTOList,"4"));
+                    engineCalculateAveragePricePerPosition.calculate(playerDataDTOList, FORWARDER));
         }
-        if ("1".equals(position)) {
+        if (GOALKEEPER.equals(position)) {
             return averagePricePerGoalkeeper;
-        } else if ("2".equals(position)) {
+        } else if (DEFENDER.equals(position)) {
             return averagePricePerDefender;
-        } else if ("3".equals(position)) {
+        } else if (MIDFIELD.equals(position)) {
             return averagePricePerMidfield;
-        } else if ("4".equals(position)) {
+        } else if (FORWARDER.equals(position)) {
             return averagePricePerForwarder;
         }
         return new Integer(0);

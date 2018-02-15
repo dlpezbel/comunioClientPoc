@@ -3,11 +3,16 @@ package quintonic.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import quintonic.dto.*;
+import quintonic.dto.AccountDataDTO;
+import quintonic.dto.PlayerDataDTO;
+import quintonic.dto.TokenDTO;
+import quintonic.dto.UserDTO;
+import quintonic.dto.response.FullPlayerDataResponseDTO;
+import quintonic.dto.response.SimplePlayerDataResponseDTO;
 import quintonic.service.BiwengerClientService;
 import quintonic.service.QuintonicService;
+import quintonic.transformer.PlayerTransformer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -15,39 +20,63 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @Controller
 @CrossOrigin
 public class QuintonicController {
-    @Autowired
-    BiwengerClientService biwengerClientService;
+
     @Autowired
     QuintonicService quintonicService;
+    @Autowired
+    PlayerTransformer playerTransformer;
+    @Autowired
+    BiwengerClientService biwengerClientService;
 
     @RequestMapping("/league/{idLeague}/market/players")
     @ResponseBody
-    List<PlayerDataDTO> getMarketScore(@RequestHeader(value="Authorization") String bearer,
-                                       @PathVariable(value="idLeague") String league) {
-        MarketDTO marketDTO = biwengerClientService.getMarket(bearer, league);
-        List<PlayerDataDTO> playerDataDTOList = new ArrayList<>();
-        setResponsePlayersList(marketDTO, playerDataDTOList);
-        quintonicService.fillPlayerScores(playerDataDTOList);
-        return playerDataDTOList;
+    List<FullPlayerDataResponseDTO> getMarketPlayersScore(@RequestHeader(value="Authorization") String bearer,
+                                                   @PathVariable(value="idLeague") String league) {
+        List<PlayerDataDTO> playerDataDTOList = quintonicService.getMarketScore(bearer, league);
+        return playerTransformer.transformListToPlayerListResponseDTO(playerDataDTOList);
+    }
+
+    @RequestMapping("/bot/league/{idLeague}/market/players")
+    @ResponseBody
+    List<SimplePlayerDataResponseDTO> getMarketPlayersScoreBot(@RequestHeader(value="Authorization") String bearer,
+                                                        @PathVariable(value="idLeague") String league) {
+        List<PlayerDataDTO> playerDataDTOList = quintonicService.getMarketScore(bearer, league);
+        return playerTransformer.transformListToSimplePlayerListResponseDTO(playerDataDTOList);
+    }
+
+    @RequestMapping("/league/{idLeague}/user/players")
+    @ResponseBody
+    List<FullPlayerDataResponseDTO> getUserPlayersScore(@RequestHeader(value="Authorization") String bearer,
+                                                        @PathVariable(value="idLeague") String league) {
+        List<PlayerDataDTO> playerDataDTOList = quintonicService.getUserPlayersScore(bearer,league);
+        return playerTransformer.transformListToPlayerListResponseDTO(playerDataDTOList);
+    }
+
+    @RequestMapping("bot/league/{idLeague}/user/players")
+    @ResponseBody
+    List<SimplePlayerDataResponseDTO> getUserPlayersScoreBot(@RequestHeader(value="Authorization") String bearer,
+                                                        @RequestHeader(value="X-League") String league) {
+        List<PlayerDataDTO> playerDataDTOList = quintonicService.getUserPlayersScore(bearer,league);
+        return playerTransformer.transformListToSimplePlayerListResponseDTO(playerDataDTOList);
     }
 
     @RequestMapping( value = "/players",params = {"name"}, method = GET )
     @ResponseBody
-    public List<PlayerDataDTO> getPlayersByName(
+    public List<FullPlayerDataResponseDTO> getPlayersByName(
             @RequestParam( "name" ) String name, @RequestParam( "size" ) int size){
-        List<PlayerDataDTO> playerDataDTOList = biwengerClientService.getPlayersByName(name);
-        quintonicService.fillPlayerScores(playerDataDTOList);
-        return playerDataDTOList;
+        List<PlayerDataDTO> playerDataDTOList = quintonicService.getPlayersByName(name);
+        return playerTransformer.transformListToPlayerListResponseDTO(playerDataDTOList);
     }
 
-    @RequestMapping("/user/players")
+/*    @RequestMapping("/league/{idLeague}/user/offer")
     @ResponseBody
-    List<PlayerDataDTO> getUserPlayersScore(@RequestHeader(value="Authorization") String bearer,
-                                            @RequestHeader(value="X-League") String league) {
-        List<PlayerDataDTO> playerDataDTOList = biwengerClientService.getUserPlayers(bearer, league);
-        quintonicService.fillPlayerScores(playerDataDTOList);
-        return playerDataDTOList;
-    }
+    public void setPlayerOffer(@RequestHeader(value="Authorization") String bearer,
+                            @PathVariable(value="idLeague") String league) {
+                            https://biwenger.as.com/api/v1/offers
+        List<PlayerDataDTO> playerDataDTOList = quintonicService.setPlayerOffer(bearer,league,offer);
+        return playerTransformer.transformListToSimplePlayerListResponseDTO(playerDataDTOList);
+    }*/
+
 
     @RequestMapping("/user/login")
     @ResponseBody
@@ -59,25 +88,6 @@ public class QuintonicController {
     @ResponseBody
     AccountDataDTO getUserAccount(@RequestHeader(value="Authorization") String bearer) {
         return biwengerClientService.getUserAccount(bearer);
-    }
-
-
-    @RequestMapping("/marketbot")
-    @ResponseBody
-    List<SimplePlayerDataDTO> getMarketScoreBot(@RequestHeader(value="Authorization") String bearer,
-                                       @RequestHeader(value="X-League") String league) {
-        MarketDTO marketDTO = biwengerClientService.getMarket(bearer, league);
-        List<PlayerDataDTO> playerDataDTOList = new ArrayList<>();
-        setResponsePlayersList(marketDTO, playerDataDTOList);
-        return quintonicService.fillPlayerScoresForBot(playerDataDTOList);
-    }
-
-    private void setResponsePlayersList(MarketDTO marketDTO, List<PlayerDataDTO> playerDataDTOList) {
-        marketDTO.getData().getSales().stream().forEach(saleDTO -> {
-            PlayerDataDTO playerDataDTO = saleDTO.getPlayer();
-            if (saleDTO.getUser()!=null)
-                playerDataDTO.setUser(saleDTO.getUser().getName());
-            playerDataDTOList.add(playerDataDTO);});
     }
 
 }
