@@ -1,7 +1,6 @@
 package quintonic.service;
 
 import quintonic.dto.PlayerDataDTO;
-import quintonic.dto.response.SimplePlayerDataResponseDTO;
 
 import java.util.List;
 
@@ -11,5 +10,5 @@ public interface QuintonicService {
 
     List<PlayerDataDTO> getPlayersByName(String name);
 
-    List<PlayerDataDTO> getUserPlayerScore(String bearer, String league);
+    List<PlayerDataDTO> getUserPlayersScore(String bearer, String league);
 }

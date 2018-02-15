@@ -1,15 +1,16 @@
 package quintonic.service;
 
 import quintonic.dto.*;
+import quintonic.dto.UserDTO;
 
 import java.util.List;
 
 public interface BiwengerClientService {
-    PlayerDTO getPlayerByName(String playerName);
+    PlayerDataDTO getPlayerByName(String playerName);
 
     TokenDTO login(UserDTO userDTO);
 
-    MarketDTO getMarket(String bearer, String league);
+    List<PlayerDataDTO> getMarketPlayers(String bearer, String league);
 
     List<PlayerDataDTO> getAllPlayers();
 

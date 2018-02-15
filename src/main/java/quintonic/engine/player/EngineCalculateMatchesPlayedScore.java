@@ -2,6 +2,7 @@ package quintonic.engine.player;
 
 import org.springframework.stereotype.Component;
 import quintonic.dto.PlayerDataDTO;
+import quintonic.dto.request.PlayerDataRequestDTO;
 
 @Component
 public class EngineCalculateMatchesPlayedScore implements EngineCalculateScore {

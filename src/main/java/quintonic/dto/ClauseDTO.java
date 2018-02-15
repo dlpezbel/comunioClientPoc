@@ -7,5 +7,5 @@ import lombok.ToString;
 @ToString
 public class ClauseDTO {
     @Getter @Setter
-    String clause;
+    Integer clause;
 }
