@@ -1,12 +1,11 @@
 package quintonic.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import quintonic.dto.AccountDataDTO;
-import quintonic.dto.PlayerDataDTO;
-import quintonic.dto.TokenDTO;
-import quintonic.dto.UserDTO;
+import quintonic.dto.*;
 import quintonic.dto.response.FullPlayerDataResponseDTO;
 import quintonic.dto.response.SimplePlayerDataResponseDTO;
 import quintonic.service.BiwengerClientService;
@@ -68,14 +67,14 @@ public class QuintonicController {
         return playerTransformer.transformListToPlayerListResponseDTO(playerDataDTOList);
     }
 
-/*    @RequestMapping("/league/{idLeague}/user/offer")
+    @RequestMapping("/league/{idLeague}/user/offer")
     @ResponseBody
-    public void setPlayerOffer(@RequestHeader(value="Authorization") String bearer,
-                            @PathVariable(value="idLeague") String league) {
-                            https://biwenger.as.com/api/v1/offers
-        List<PlayerDataDTO> playerDataDTOList = quintonicService.setPlayerOffer(bearer,league,offer);
-        return playerTransformer.transformListToSimplePlayerListResponseDTO(playerDataDTOList);
-    }*/
+    public HttpStatus setPlayerOffer(@RequestHeader(value="Authorization") String bearer,
+                                            @PathVariable(value="idLeague") String league, @RequestBody OfferDTO offer) {
+        quintonicService.setPlayerOffer(bearer,league,offer);
+        return HttpStatus.OK;
+
+    }
 
 
     @RequestMapping("/user/login")

@@ -36,8 +36,12 @@ public class PlayerTransformer {
         playerDataDTOList.stream().forEach(playerDataDTO -> {
             FullPlayerDataResponseDTO fullPlayerDataResponseDTO = new FullPlayerDataResponseDTO();
             BeanUtils.copyProperties(playerDataDTO, fullPlayerDataResponseDTO);
-            fullPlayerDataResponseDTO.setOwner(playerDataDTO.getOwner().orElseGet(() -> "Computer" ));
-            fullPlayerDataResponseDTO.setClause(playerDataDTO.getClause().orElseGet(() -> 0 ));
+            if (playerDataDTO.getOwner()!=null) {
+                fullPlayerDataResponseDTO.setOwner(playerDataDTO.getOwner().orElseGet(() -> "Computer"));
+            }
+            if (playerDataDTO.getClause()!=null) {
+                fullPlayerDataResponseDTO.setClause(playerDataDTO.getClause().orElseGet(() -> 0));
+            }
             playerDataResponseDTOList.add(fullPlayerDataResponseDTO);
         });
         return playerDataResponseDTOList;

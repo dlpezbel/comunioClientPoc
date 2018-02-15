@@ -2,6 +2,7 @@ package quintonic.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import quintonic.dto.OfferDTO;
 import quintonic.dto.PlayerDataDTO;
 import quintonic.engine.market.EngineAveragePricePerPosition;
 import quintonic.engine.market.EngineCalculateAveragePricePerPosition;
@@ -82,6 +83,11 @@ public class QuintonicServiceImpl implements QuintonicService{
         fillPlayerScores(playerDataDTOList);
         evaluatePlayersForSell(playerDataDTOList);
         return playerDataDTOList;
+    }
+
+    @Override
+    public void setPlayerOffer(String bearer, String league, OfferDTO offer) {
+        biwengerClientService.setPlayerOffer(bearer, league, offer);
     }
 
     private void evaluatePlayersForSell(List<PlayerDataDTO> playerDataDTOList) {

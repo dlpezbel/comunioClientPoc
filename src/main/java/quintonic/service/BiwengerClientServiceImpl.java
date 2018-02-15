@@ -123,6 +123,18 @@ public class BiwengerClientServiceImpl implements BiwengerClientService {
         return playerDataDTOList;
     }
 
+    @Override
+    public void setPlayerOffer(String bearer, String league, OfferDTO offer) {
+        final String uri = "https://biwenger.as.com/api/v1/offers";
+        RestTemplate restTemplate = getRestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", bearer);
+
+        HttpEntity<OfferDTO> request = new HttpEntity<OfferDTO>(offer, headers);
+        restTemplate.postForObject(uri, request, String.class);
+    }
+
 
     private List<PlayerDataDTO> getPlayerListFromMarket(MarketDTO marketDTO) {
         List<PlayerDataDTO> playerDataDTOList = new ArrayList<>();

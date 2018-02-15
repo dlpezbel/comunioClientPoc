@@ -19,4 +19,6 @@ public interface BiwengerClientService {
     AccountDataDTO getUserAccount(String bearer);
 
     List<PlayerDataDTO> getPlayersByName(String name);
+
+    void setPlayerOffer(String bearer, String league, OfferDTO offer);
 }
