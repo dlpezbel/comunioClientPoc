@@ -152,7 +152,8 @@ public class BiwengerClientServiceImpl implements BiwengerClientService {
         ResponseEntity<MarketDTO> result = getRestTemplate().exchange(uri, HttpMethod.GET, entity, MarketDTO.class);
         MarketDTO marketDTO = result.getBody();
 
-        return marketDTO.getData().getOffers();
+        //return marketDTO.getData().getOffers();
+        return null;
     }
 
     @Override

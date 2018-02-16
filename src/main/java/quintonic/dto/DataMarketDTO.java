@@ -12,6 +12,6 @@ public class DataMarketDTO {
     @Getter @Setter
     List<SaleRequestDTO> sales;
 
-    @Getter @Setter
-    List<OfferDTO> offers;
+    //@Getter @Setter
+    //List<OfferDTO> offers;
 }
