@@ -13,6 +13,7 @@ import quintonic.service.QuintonicService;
 import quintonic.transformer.PlayerTransformer;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
@@ -73,9 +74,14 @@ public class QuintonicController {
                                             @PathVariable(value="idLeague") String league, @RequestBody OfferDTO offer) {
         quintonicService.setPlayerOffer(bearer,league,offer);
         return HttpStatus.OK;
-
     }
 
+    @RequestMapping("/league/{idLeague}/market/offers")
+    @ResponseBody
+    public List<OfferDTO> getPlayerOffers(@RequestHeader(value="Authorization") String bearer,
+                                     @PathVariable(value="idLeague") String league) {
+        return quintonicService.getPlayerOffers(bearer,league);
+    }
 
     @RequestMapping("/user/login")
     @ResponseBody
@@ -89,4 +95,13 @@ public class QuintonicController {
         return biwengerClientService.getUserAccount(bearer);
     }
 
+    @RequestMapping("/league/{idLeague}/users/money")
+    @ResponseBody
+    public Map<String, Integer> getUsersMoney(@RequestHeader(value="Authorization") String bearer,
+                                              @PathVariable(value="idLeague") String league,
+                                              @RequestParam( "bonus" ) int bonus) {
+        BonusDTO bonusDTO = new BonusDTO();
+        bonusDTO.setBonus(bonus);
+        return quintonicService.getUsersMoney(bearer, league, bonusDTO);
+    }
 }
