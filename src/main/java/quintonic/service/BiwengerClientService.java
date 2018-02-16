@@ -4,6 +4,7 @@ import quintonic.dto.*;
 import quintonic.dto.UserDTO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface BiwengerClientService {
     PlayerDataDTO getPlayerByName(String playerName);
@@ -21,4 +22,8 @@ public interface BiwengerClientService {
     List<PlayerDataDTO> getPlayersByName(String name);
 
     void setPlayerOffer(String bearer, String league, OfferDTO offer);
+
+    List<OfferDTO> getPlayerOffers(String bearer, String league);
+
+    Map<String, Integer> getUsersMoney(String bearer, String league, BonusDTO bonus);
 }

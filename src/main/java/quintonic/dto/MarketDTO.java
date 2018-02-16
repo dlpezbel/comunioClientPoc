@@ -11,4 +11,6 @@ public class MarketDTO {
 
     @Getter @Setter
     DataMarketDTO data;
+
+
 }
