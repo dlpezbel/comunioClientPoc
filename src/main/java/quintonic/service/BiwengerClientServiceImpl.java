@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import quintonic.dto.*;
 import quintonic.dto.request.*;
-import quintonic.dto.UserDTO;
 import quintonic.engine.player.EngineCalculateAverageFitnessScore;
 import quintonic.transformer.PlayerTransformer;
 import quintonic.transformer.TransferTransformer;

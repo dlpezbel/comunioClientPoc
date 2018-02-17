@@ -56,6 +56,29 @@ public class QuintonicServiceImpl implements QuintonicService{
         return playerDataDTOList;
     }
 
+    @Override
+    public List<PlayerDataDTO> getUserPlayersScore(String bearer, String league) {
+        List<PlayerDataDTO> playerDataDTOList = biwengerClientService.getUserPlayers(bearer, league);
+        fillPlayerScores(playerDataDTOList);
+        evaluatePlayersForSell(playerDataDTOList);
+        return playerDataDTOList;
+    }
+
+    @Override
+    public void setPlayerOffer(String bearer, String league, OfferDTO offer) {
+        biwengerClientService.setPlayerOffer(bearer, league, offer);
+    }
+
+    @Override
+    public List<OfferDTO> getPlayerOffers(String bearer, String league) {
+        return biwengerClientService.getPlayerOffers(bearer, league);
+    }
+
+    @Override
+    public Map<String, Integer> getUsersMoney(String bearer, String league, BonusDTO bonus) {
+        return biwengerClientService.getUsersMoney(bearer, league, bonus);
+    }
+
     private void evaluatePlayersForBuy(List<PlayerDataDTO> playerDataDTOList) {
         playerDataDTOList.stream().forEach(player -> {
             if ("injured".equals(player.getFitness().get(0))) {
@@ -80,29 +103,6 @@ public class QuintonicServiceImpl implements QuintonicService{
         });
     }
 
-    @Override
-    public List<PlayerDataDTO> getUserPlayersScore(String bearer, String league) {
-        List<PlayerDataDTO> playerDataDTOList = biwengerClientService.getUserPlayers(bearer, league);
-        fillPlayerScores(playerDataDTOList);
-        evaluatePlayersForSell(playerDataDTOList);
-        return playerDataDTOList;
-    }
-
-    @Override
-    public void setPlayerOffer(String bearer, String league, OfferDTO offer) {
-        biwengerClientService.setPlayerOffer(bearer, league, offer);
-    }
-
-    @Override
-    public List<OfferDTO> getPlayerOffers(String bearer, String league) {
-        return biwengerClientService.getPlayerOffers(bearer, league);
-    }
-
-    @Override
-    public Map<String, Integer> getUsersMoney(String bearer, String league, BonusDTO bonus) {
-        return biwengerClientService.getUsersMoney(bearer, league, bonus);
-    }
-
     private void evaluatePlayersForSell(List<PlayerDataDTO> playerDataDTOList) {
         playerDataDTOList.stream().forEach(player -> {
             if ("injured".equals(player.getFitness().get(0))) {
@@ -113,33 +113,44 @@ public class QuintonicServiceImpl implements QuintonicService{
                         player.getPriceIndicatorScore() +
                         player.getMatchesPlayedScore()) / 4;
                 player.setScore(finalScore);
-                StringBuffer recommendedAction = new StringBuffer();
+
+                if (finalScore < 0.25){
+                    player.setRecommendedAction("Not lineup. Sell player.");
+                } else if (finalScore < 0.5){
+                    player.setRecommendedAction("Sell player.");
+                } else if (finalScore <= 0.75){
+                    player.setRecommendedAction("Lineup. Evaluate sell player.");
+                } else if (finalScore > 0.75){
+                    player.setRecommendedAction("Lineup. Keep player.");
+                }
+
+                StringBuffer reccommendedActionDetails = new StringBuffer();
 
                 if (player.getPriceIndicatorScore()==1) {
-                    recommendedAction.append("The price of the player has increased. ");
+                    reccommendedActionDetails.append("The price of the player has increased. ");
                 } else {
-                    recommendedAction.append("The price of the player has decreased. ");
+                    reccommendedActionDetails.append("The price of the player has decreased. ");
                 }
                 if (player.getAveragePriceScore()==1) {
-                    recommendedAction.append("The price of the player is higher than the position average, so  ");
+                    reccommendedActionDetails.append("The price of the player is higher than the position average, so  ");
                 } else {
-                    recommendedAction.append("The price of the player is lower than the position average, his value should be grow up. ");
+                    reccommendedActionDetails.append("The price of the player is lower than the position average, his value should be grow up. ");
                 }
                 if (player.getMatchesPlayedScore()==1) {
-                    recommendedAction.append("Plays everything.");
+                    reccommendedActionDetails.append("Plays everything.");
                 }else if (player.getMatchesPlayedScore()>=0.75) {
-                    recommendedAction.append("Plays almost everything.");
+                    reccommendedActionDetails.append("Plays almost everything.");
                 }else if (player.getMatchesPlayedScore()>=0.5) {
-                    recommendedAction.append("Don't play very much, check team lineup. ");
+                    reccommendedActionDetails.append("Don't play very much, check team lineup. ");
                 }else if (player.getMatchesPlayedScore()<0.5) {
-                    recommendedAction.append("Dont't play enough, consider to sell him. ");
+                    reccommendedActionDetails.append("Dont't play enough, consider to sell him. ");
                 }
                 if (player.getAverageFitnessScore()==1) {
-                    recommendedAction.append("The player has a good fitness moment. Keep on lineup. ");
+                    reccommendedActionDetails.append("The player has a good fitness moment. Keep on lineup. ");
                 } else {
-                    recommendedAction.append("The player is not in his best moment. ");
+                    reccommendedActionDetails.append("The player is not in his best moment. ");
                 }
-                player.setRecommendedAction(recommendedAction.toString());
+                player.setRecommendedActionDetails(reccommendedActionDetails.toString());
             }
         });
     }

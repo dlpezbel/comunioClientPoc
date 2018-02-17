@@ -1,6 +1,5 @@
 package quintonic.service;
 
-import org.springframework.http.HttpStatus;
 import quintonic.dto.BonusDTO;
 import quintonic.dto.OfferDTO;
 import quintonic.dto.PlayerDataDTO;

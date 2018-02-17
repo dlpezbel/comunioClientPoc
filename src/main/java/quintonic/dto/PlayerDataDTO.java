@@ -55,4 +55,6 @@ public class PlayerDataDTO {
     Double score;
     @Getter @Setter
     String recommendedAction;
+    @Getter @Setter
+    String recommendedActionDetails;
 }

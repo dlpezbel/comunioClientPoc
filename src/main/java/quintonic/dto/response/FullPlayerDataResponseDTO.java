@@ -57,4 +57,6 @@ public class FullPlayerDataResponseDTO extends DataDTO{
     Double score;
     @Getter @Setter
     String recommendedAction;
+    @Getter @Setter
+    String recommendedActionDetails;
 }
