@@ -26,7 +26,7 @@ public class EngineCalculateAverageFitnessScore implements EngineCalculateScore 
     }
 
     private double getTotalAverage(PlayerDataDTO playerDataDTO) {
-        int totalPlayed =  playerDataDTO.getPlayedAway()+playerDataDTO.getPlayedAway();
+        int totalPlayed =  playerDataDTO.getPlayedAway()+playerDataDTO.getPlayedHome();
         if (totalPlayed > 0) {
             return (double) (playerDataDTO.getPoints() / totalPlayed);
         } else {
@@ -36,12 +36,17 @@ public class EngineCalculateAverageFitnessScore implements EngineCalculateScore 
 
     private OptionalDouble getPartialAverage(PlayerDataDTO playerDataDTO) {
         return playerDataDTO.getFitness().stream().filter(s -> {
-                try{
-                    Integer.parseInt(s);
-                    return true;
-                }catch(NumberFormatException e){
-                    //not int
-                    return false;
-                }}).mapToInt(fitness -> Integer.parseInt(fitness)).average();
+            return isInteger(s);
+        }).mapToInt(fitness -> Integer.parseInt(fitness)).average();
+    }
+
+    private boolean isInteger(String s) {
+        try{
+            Integer.parseInt(s);
+            return true;
+        }catch(NumberFormatException e){
+            //not int
+            return false;
+        }
     }
 }
