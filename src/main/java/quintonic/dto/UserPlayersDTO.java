@@ -3,7 +3,7 @@ package quintonic.dto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import quintonic.dto.request.PlayerDataRequestDTO;
+import quintonic.dto.biwenger.PlayerDataRequestDTO;
 
 import java.util.List;
 

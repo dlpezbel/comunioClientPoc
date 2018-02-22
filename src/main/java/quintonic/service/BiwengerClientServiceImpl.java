@@ -5,9 +5,10 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import quintonic.dto.*;
-import quintonic.dto.request.*;
+import quintonic.dto.biwenger.*;
 import quintonic.engine.player.EngineCalculateAverageFitnessScore;
 import quintonic.transformer.PlayerTransformer;
+import quintonic.service.helper.TransferHelper;
 import quintonic.transformer.TransferTransformer;
 
 import java.util.*;
@@ -21,6 +22,9 @@ public class BiwengerClientServiceImpl implements BiwengerClientService {
 
     @Autowired
     PlayerTransformer playerTransformer;
+
+    @Autowired
+    TransferHelper transferHelper;
 
     @Autowired
     TransferTransformer transferTransformer;
@@ -126,7 +130,7 @@ public class BiwengerClientServiceImpl implements BiwengerClientService {
     }
 
     @Override
-    public void setPlayerOffer(String bearer, String league, OfferDTO offer) {
+    public OfferDTO setPlayerOffer(String bearer, String league, OfferDTO offer) {
         final String uri = "https://biwenger.as.com/api/v1/offers";
         RestTemplate restTemplate = getRestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -135,7 +139,8 @@ public class BiwengerClientServiceImpl implements BiwengerClientService {
         headers.set("X-League", league);
 
         HttpEntity<OfferDTO> request = new HttpEntity<OfferDTO>(offer, headers);
-        restTemplate.postForObject(uri, request, String.class);
+        OfferResponseDTO offerResponseDTO = restTemplate.postForObject(uri, request, OfferResponseDTO.class);
+        return transferTransformer.transformToOfferDTO(offerResponseDTO.getData());
     }
 
     @Override
@@ -151,8 +156,8 @@ public class BiwengerClientServiceImpl implements BiwengerClientService {
         ResponseEntity<MarketDTO> result = getRestTemplate().exchange(uri, HttpMethod.GET, entity, MarketDTO.class);
         MarketDTO marketDTO = result.getBody();
 
-        //return marketDTO.getData().getOffers();
-        return null;
+        List<OfferDTO> playerDataDTOList =  transferTransformer.transformOffersRequestListToOfferListDTO(marketDTO.getData().getOffers());
+        return playerDataDTOList;
     }
 
     @Override
@@ -167,13 +172,26 @@ public class BiwengerClientServiceImpl implements BiwengerClientService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
         ResponseEntity<TransferMarketRequestDTO> result = getRestTemplate().exchange(uri, HttpMethod.GET, entity, TransferMarketRequestDTO.class);
         List<TransferMarketDataRequestDTO> transferMarketDataRequestDTOList = result.getBody().getData();
-        Map<String,Integer> moneyByUser = transferTransformer.processTransfers(transferMarketDataRequestDTOList, initialBonus);
+        Map<String,Integer> moneyByUser = transferHelper.processTransfers(transferMarketDataRequestDTOList, initialBonus);
 
         NewsRequestDTO newsRequest = getUserBonus(bearer, league);
 
-        transferTransformer.addBonusByUser(newsRequest,moneyByUser,initialBonus);
+        transferHelper.addBonusByUser(newsRequest,moneyByUser,initialBonus);
 
         return moneyByUser;
+    }
+
+    @Override
+    public void removeOffer(String bearer, String league, String idOffer) {
+        final String uri = "https://biwenger.as.com/api/v1/offers/" + idOffer;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        headers.set("Authorization", bearer);
+        headers.set("X-League", league);
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        getRestTemplate().exchange(uri, HttpMethod.DELETE, entity, String.class);
     }
 
     private NewsRequestDTO getUserBonus(String bearer, String league) {

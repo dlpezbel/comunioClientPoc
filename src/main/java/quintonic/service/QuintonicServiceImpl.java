@@ -1,7 +1,6 @@
 package quintonic.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import quintonic.dto.BonusDTO;
 import quintonic.dto.OfferDTO;
@@ -65,8 +64,8 @@ public class QuintonicServiceImpl implements QuintonicService{
     }
 
     @Override
-    public void setPlayerOffer(String bearer, String league, OfferDTO offer) {
-        biwengerClientService.setPlayerOffer(bearer, league, offer);
+    public OfferDTO setPlayerOffer(String bearer, String league, OfferDTO offer) {
+        return biwengerClientService.setPlayerOffer(bearer, league, offer);
     }
 
     @Override
@@ -77,6 +76,11 @@ public class QuintonicServiceImpl implements QuintonicService{
     @Override
     public Map<String, Integer> getUsersMoney(String bearer, String league, BonusDTO bonus) {
         return biwengerClientService.getUsersMoney(bearer, league, bonus);
+    }
+
+    @Override
+    public void removeOffer(String bearer, String league, String idOffer) {
+        biwengerClientService.removeOffer(bearer, league, idOffer);
     }
 
     private void evaluatePlayersForBuy(List<PlayerDataDTO> playerDataDTOList) {

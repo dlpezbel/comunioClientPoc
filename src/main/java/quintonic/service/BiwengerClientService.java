@@ -21,9 +21,11 @@ public interface BiwengerClientService {
 
     List<PlayerDataDTO> getPlayersByName(String name);
 
-    void setPlayerOffer(String bearer, String league, OfferDTO offer);
+    OfferDTO setPlayerOffer(String bearer, String league, OfferDTO offer);
 
     List<OfferDTO> getPlayerOffers(String bearer, String league);
 
     Map<String, Integer> getUsersMoney(String bearer, String league, BonusDTO bonus);
+
+    void removeOffer(String bearer, String league, String idOffer);
 }

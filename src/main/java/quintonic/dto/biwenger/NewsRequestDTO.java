@@ -1,4 +1,4 @@
-package quintonic.dto.request;
+package quintonic.dto.biwenger;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -3,7 +3,6 @@ package quintonic.engine.player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import quintonic.dto.PlayerDataDTO;
-import quintonic.dto.request.PlayerDataRequestDTO;
 import quintonic.engine.market.EngineAveragePricePerPosition;
 
 @Component

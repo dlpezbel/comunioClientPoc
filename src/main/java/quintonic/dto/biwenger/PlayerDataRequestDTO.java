@@ -1,12 +1,10 @@
-package quintonic.dto.request;
+package quintonic.dto.biwenger;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import quintonic.dto.ClauseDTO;
-import quintonic.dto.OwnerDTO;
 import quintonic.dto.TeamDTO;
-import quintonic.dto.UserDTO;
 
 import java.util.List;
 

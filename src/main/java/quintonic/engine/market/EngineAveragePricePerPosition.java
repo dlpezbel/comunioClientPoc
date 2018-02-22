@@ -5,7 +5,6 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import quintonic.dto.PlayerDataDTO;
-import quintonic.dto.request.PlayerDataRequestDTO;
 import quintonic.service.BiwengerClientService;
 
 import java.util.Calendar;
