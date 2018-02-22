@@ -13,12 +13,9 @@ public class EngineCalculateAverageFitnessScore implements EngineCalculateScore 
         OptionalDouble partialAverageOptional = getPartialAverage(playerDataDTO);
 
         if (partialAverageOptional.isPresent()) {
-            System.out.println("Average last 5 matches: " + partialAverageOptional.getAsDouble() + " media total: " + totalAverage);
             if (partialAverageOptional.getAsDouble() > totalAverage) {
-                System.out.println(playerDataDTO.getName() + ": Score last 5 matches is better than global average.");
                 return new Double(1);
             } else {
-                System.out.println(playerDataDTO.getName() +": Score last 5 matches is worse than global average.");
                 return new Double(0);
             }
         }
