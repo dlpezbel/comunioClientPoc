@@ -2,7 +2,6 @@ package quintonic.engine.market;
 
 import org.springframework.stereotype.Component;
 import quintonic.dto.PlayerDataDTO;
-import quintonic.dto.request.PlayerDataRequestDTO;
 
 import java.util.List;
 

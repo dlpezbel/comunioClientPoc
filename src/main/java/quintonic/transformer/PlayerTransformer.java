@@ -3,7 +3,7 @@ package quintonic.transformer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import quintonic.dto.PlayerDataDTO;
-import quintonic.dto.request.PlayerDataRequestDTO;
+import quintonic.dto.biwenger.PlayerDataRequestDTO;
 import quintonic.dto.response.FullPlayerDataResponseDTO;
 import quintonic.dto.response.SimplePlayerDataResponseDTO;
 

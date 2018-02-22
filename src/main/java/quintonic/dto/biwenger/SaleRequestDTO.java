@@ -1,10 +1,9 @@
-package quintonic.dto.request;
+package quintonic.dto.biwenger;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import quintonic.dto.OwnerDTO;
-import quintonic.dto.request.PlayerDataRequestDTO;
 
 @ToString
 public class SaleRequestDTO {

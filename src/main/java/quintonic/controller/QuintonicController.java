@@ -15,6 +15,7 @@ import quintonic.transformer.PlayerTransformer;
 import java.util.List;
 import java.util.Map;
 
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @Controller
@@ -70,10 +71,19 @@ public class QuintonicController {
 
     @RequestMapping("/league/{idLeague}/user/offer")
     @ResponseBody
-    public HttpStatus setPlayerOffer(@RequestHeader(value="Authorization") String bearer,
+    public OfferDTO setPlayerOffer(@RequestHeader(value="Authorization") String bearer,
                                             @PathVariable(value="idLeague") String league, @RequestBody OfferDTO offer) {
-        quintonicService.setPlayerOffer(bearer,league,offer);
-        return HttpStatus.OK;
+        return quintonicService.setPlayerOffer(bearer,league,offer);
+    }
+
+
+    @RequestMapping( value = "/league/{idLeague}/user/offer/{idOffer}", method = DELETE )
+    @ResponseBody
+    public void removeOffer(@RequestHeader(value="Authorization") String bearer,
+                                 @PathVariable(value="idLeague") String league,
+                                 @PathVariable(value="idOffer") String idOffer){
+        quintonicService.removeOffer(bearer, league, idOffer);
+        return;
     }
 
     @RequestMapping("/league/{idLeague}/market/offers")
