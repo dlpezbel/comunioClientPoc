@@ -86,8 +86,7 @@ public class QuintonicServiceImpl implements QuintonicService{
     private void evaluatePlayersForBuy(List<PlayerDataDTO> playerDataDTOList) {
         playerDataDTOList.stream().forEach(player -> {
             if ("injured".equals(player.getFitness().get(0))) {
-                System.out.println(player.getName() + ": injured player!!");
-                player.setRecommendedAction("Not buy, injured");
+                player.setRecommendedAction("No comprar, lesionado");
             } else {
                 double finalScore = (player.getAverageFitnessScore() +
                         player.getAveragePriceScore() +
@@ -95,13 +94,13 @@ public class QuintonicServiceImpl implements QuintonicService{
                         player.getMatchesPlayedScore()) / 4;
                 player.setScore(finalScore);
                 if (finalScore < 0.25){
-                    player.setRecommendedAction("Not buy!!!");
-                } else if (finalScore < 0.5){
-                    player.setRecommendedAction("Not Buy");
+                    player.setRecommendedAction("¡No comprar!");
+                } else if (finalScore <= 0.5){
+                    player.setRecommendedAction("No comprar");
                 } else if (finalScore <= 0.75){
-                    player.setRecommendedAction("Evaluate");
+                    player.setRecommendedAction("Evaluar");
                 } else if (finalScore > 0.75){
-                    player.setRecommendedAction("Buy!!!");
+                    player.setRecommendedAction("Comprar");
                 }
             }
         });
@@ -110,7 +109,7 @@ public class QuintonicServiceImpl implements QuintonicService{
     private void evaluatePlayersForSell(List<PlayerDataDTO> playerDataDTOList) {
         playerDataDTOList.stream().forEach(player -> {
             if ("injured".equals(player.getFitness().get(0))) {
-                player.setRecommendedAction("Injured");
+                player.setRecommendedAction("Lesionado");
             } else {
                 double finalScore = (player.getAverageFitnessScore() +
                         player.getAveragePriceScore() +
@@ -119,40 +118,40 @@ public class QuintonicServiceImpl implements QuintonicService{
                 player.setScore(finalScore);
 
                 if (finalScore < 0.25){
-                    player.setRecommendedAction("Not lineup. Sell player.");
+                    player.setRecommendedAction("No alinear. Vender jugador.");
                 } else if (finalScore < 0.5){
-                    player.setRecommendedAction("Sell player.");
+                    player.setRecommendedAction("Vender jugador.");
                 } else if (finalScore <= 0.75){
-                    player.setRecommendedAction("Lineup. Evaluate sell player.");
+                    player.setRecommendedAction("Alinear. Evaluar posible venta.");
                 } else if (finalScore > 0.75){
-                    player.setRecommendedAction("Lineup. Keep player.");
+                    player.setRecommendedAction("Alinear y mantener.");
                 }
 
                 StringBuffer reccommendedActionDetails = new StringBuffer();
 
                 if (player.getPriceIndicatorScore()==1) {
-                    reccommendedActionDetails.append("The price of the player has increased. ");
+                    reccommendedActionDetails.append("El precio del jugador está subiendo. ");
                 } else {
-                    reccommendedActionDetails.append("The price of the player has decreased. ");
+                    reccommendedActionDetails.append("El precion del jugador está bajando. ");
                 }
                 if (player.getAveragePriceScore()==1) {
-                    reccommendedActionDetails.append("The price of the player is higher than the position average, so  ");
+                    reccommendedActionDetails.append("Jugador caro, el precion del jugador es más alto que el de la media por puntos en su posición. ");
                 } else {
-                    reccommendedActionDetails.append("The price of the player is lower than the position average, his value should be grow up. ");
+                    reccommendedActionDetails.append("Jugador barato, el precio del jugador es más bajo que el de la media por puntos en su posición.");
                 }
                 if (player.getMatchesPlayedScore()==1) {
-                    reccommendedActionDetails.append("Plays everything.");
+                    reccommendedActionDetails.append("Juega todo.");
                 }else if (player.getMatchesPlayedScore()>=0.75) {
-                    reccommendedActionDetails.append("Plays almost everything.");
+                    reccommendedActionDetails.append("Juega casi todo.");
                 }else if (player.getMatchesPlayedScore()>=0.5) {
-                    reccommendedActionDetails.append("Don't play very much, check team lineup. ");
+                    reccommendedActionDetails.append("No juega mucho, evaluar su posible alineación. ");
                 }else if (player.getMatchesPlayedScore()<0.5) {
-                    reccommendedActionDetails.append("Dont't play enough, consider to sell him. ");
+                    reccommendedActionDetails.append("No juega suficiente, considera su venta. ");
                 }
                 if (player.getAverageFitnessScore()==1) {
-                    reccommendedActionDetails.append("The player has a good fitness moment. Keep on lineup. ");
+                    reccommendedActionDetails.append("El jugador está en un buen momento de forma. Mantener en alineación. ");
                 } else {
-                    reccommendedActionDetails.append("The player is not in his best moment. ");
+                    reccommendedActionDetails.append("No está en su mejor momento. ");
                 }
                 player.setRecommendedActionDetails(reccommendedActionDetails.toString());
             }

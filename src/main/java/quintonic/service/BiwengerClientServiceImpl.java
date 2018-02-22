@@ -7,8 +7,8 @@ import org.springframework.web.client.RestTemplate;
 import quintonic.dto.*;
 import quintonic.dto.biwenger.*;
 import quintonic.engine.player.EngineCalculateAverageFitnessScore;
-import quintonic.transformer.PlayerTransformer;
 import quintonic.service.helper.TransferHelper;
+import quintonic.transformer.PlayerTransformer;
 import quintonic.transformer.TransferTransformer;
 
 import java.util.*;
@@ -54,7 +54,6 @@ public class BiwengerClientServiceImpl implements BiwengerClientService {
         HttpEntity<UserDTO> request = new HttpEntity<>(new UserDTO(userDTO.getEmail(),userDTO.getPassword()));
 
         TokenDTO tokenDTO = restTemplate.postForObject(uri,request,TokenDTO.class);
-        System.out.println(tokenDTO);
 
         return tokenDTO;
     }
