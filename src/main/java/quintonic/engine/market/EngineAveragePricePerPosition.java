@@ -4,12 +4,15 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import quintonic.PlayersDataService;
 import quintonic.dto.PlayerDataDTO;
 import quintonic.service.BiwengerClientService;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Component
 public class EngineAveragePricePerPosition {
@@ -32,12 +35,13 @@ public class EngineAveragePricePerPosition {
     @Autowired
     EngineCalculateAveragePricePerPosition engineCalculateAveragePricePerPosition;
 
-    Date date;
+    @Autowired
+    PlayersDataService playersDataService;
+
 
     public Integer getAveragePricePerPosition(String position) {
-        if (date == null || yesterday().after(date)) {
-            date = new Date(System.currentTimeMillis());
-            List<PlayerDataDTO> playerDataDTOList = biwengerClientService.getAllPlayers();
+
+            List<PlayerDataDTO> playerDataDTOList = (List<PlayerDataDTO>) playersDataService.getPlayers().values().stream().collect(Collectors.toList());
             this.setAveragePricePerGoalkeeper(
                     engineCalculateAveragePricePerPosition.calculate(playerDataDTOList, GOALKEEPER));
             this.setAveragePricePerDefender(
@@ -46,7 +50,7 @@ public class EngineAveragePricePerPosition {
                     engineCalculateAveragePricePerPosition.calculate(playerDataDTOList, MIDFIELD));
             this.setAveragePricePerForwarder(
                     engineCalculateAveragePricePerPosition.calculate(playerDataDTOList, FORWARDER));
-        }
+
         if (GOALKEEPER.equals(position)) {
             return averagePricePerGoalkeeper;
         } else if (DEFENDER.equals(position)) {

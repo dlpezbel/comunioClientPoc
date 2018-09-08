@@ -13,7 +13,7 @@ public interface BiwengerClientService {
 
     List<PlayerDataDTO> getMarketPlayers(String bearer, String league);
 
-    List<PlayerDataDTO> getAllPlayers();
+    Map getAllPlayers();
 
     List<PlayerDataDTO> getUserPlayers(String bearer, String league);
 

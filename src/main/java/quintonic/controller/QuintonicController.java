@@ -29,6 +29,18 @@ public class QuintonicController {
     @Autowired
     BiwengerClientService biwengerClientService;
 
+    @RequestMapping("/user/login")
+    @ResponseBody
+    TokenDTO login(@RequestBody UserDTO userDTO) {
+        return biwengerClientService.login(userDTO);
+    }
+
+    @RequestMapping("/user/account")
+    @ResponseBody
+    AccountDataDTO getUserAccount(@RequestHeader(value="Authorization") String bearer) {
+        return biwengerClientService.getUserAccount(bearer);
+    }
+
     @RequestMapping("/league/{idLeague}/market/players")
     @ResponseBody
     List<FullPlayerDataResponseDTO> getMarketPlayersScore(@RequestHeader(value="Authorization") String bearer,
@@ -93,17 +105,6 @@ public class QuintonicController {
         return quintonicService.getPlayerOffers(bearer,league);
     }
 
-    @RequestMapping("/user/login")
-    @ResponseBody
-    TokenDTO login(@RequestBody UserDTO userDTO) {
-        return biwengerClientService.login(userDTO);
-    }
-
-    @RequestMapping("/user/account")
-    @ResponseBody
-    AccountDataDTO getUserAccount(@RequestHeader(value="Authorization") String bearer) {
-        return biwengerClientService.getUserAccount(bearer);
-    }
 
     @RequestMapping("/league/{idLeague}/users/money")
     @ResponseBody

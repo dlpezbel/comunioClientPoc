@@ -1,7 +1,11 @@
 package quintonic.service;
 
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import quintonic.dto.*;
@@ -60,7 +64,7 @@ public class BiwengerClientServiceImpl implements BiwengerClientService {
 
     @Override
     public List<PlayerDataDTO> getMarketPlayers(String bearer, String league) {
-        final String uri = "https://biwenger.as.com/api/v1/market?&limit=100";
+        final String uri = "https://biwenger.as.com/api/v2/market";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -75,13 +79,18 @@ public class BiwengerClientServiceImpl implements BiwengerClientService {
         return playerDataDTOList;
     }
 
-    public List<PlayerDataDTO> getAllPlayers() {
-        final String uri = "https://biwenger.as.com/api/v1/players/la-liga?&q=a&limit=1000";
+    public Map getAllPlayers() {
+        final String uri = "https://cf.biwenger.com/api/v2/competitions/la-liga/data?score=1";
+        CloseableHttpClient httpClient = HttpClients.custom().setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
 
-        RestTemplate restTemplate = getRestTemplate();
-        PlayersDTO allPlayers = restTemplate.getForObject(uri, PlayersDTO.class);
-        List<PlayerDataDTO> playerDataDTOList =  playerTransformer.transformPlayerRequestListToPlayerListDTO(allPlayers.getData());
-        return playerDataDTOList;
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+        requestFactory.setHttpClient(httpClient);
+
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
+
+        LeagueDataDTO leagueDataDTO = restTemplate.getForObject(uri, LeagueDataDTO.class);
+        Map players = leagueDataDTO.getData().getPlayers();
+        return players;
     }
 
     @Override

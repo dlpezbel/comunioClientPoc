@@ -42,6 +42,7 @@ public class QuintonicServiceImpl implements QuintonicService{
     @Override
     public List<PlayerDataDTO> getMarketScore(String bearer, String league) {
         List<PlayerDataDTO> playerDataDTOList = biwengerClientService.getMarketPlayers(bearer, league);
+
         fillPlayerScores(playerDataDTOList);
         evaluatePlayersForBuy(playerDataDTOList);
         return playerDataDTOList;
@@ -159,20 +160,20 @@ public class QuintonicServiceImpl implements QuintonicService{
     }
 
     public void fillPlayerScores(List<PlayerDataDTO> playerDataDTOList) {
-        playerDataDTOList.stream().forEach(player -> {
-            Double averageFitnessScore = engineCalculateAverageFitnessScore.getScore(player);
-            player.setAverageFitnessScore(averageFitnessScore);
-        });
-
+//        playerDataDTOList.stream().forEach(player -> {
+//            Double averageFitnessScore = engineCalculateAverageFitnessScore.getScore(player);
+//            player.setAverageFitnessScore(averageFitnessScore);
+//        });
+//
         playerDataDTOList.stream().forEach(player -> {
             Double averagePriceScore = engineCalculateAveragePriceScore.getScore(player);
             player.setAveragePriceScore(averagePriceScore);
         });
 
-        playerDataDTOList.stream().forEach(player -> {
-            Double priceIndicatorScore = engineCalculatePriceIndicatorScore.getScore(player);
-            player.setPriceIndicatorScore(priceIndicatorScore);
-        });
+//        playerDataDTOList.stream().forEach(player -> {
+//            Double priceIndicatorScore = engineCalculatePriceIndicatorScore.getScore(player);
+//            player.setPriceIndicatorScore(priceIndicatorScore);
+//        });
 
         playerDataDTOList.stream().forEach(player -> {
             Double matchesPlayedScore = engineCalculateMatchesPlayedScore.getScore(player);
