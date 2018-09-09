@@ -65,8 +65,8 @@ public class QuintonicServiceImpl implements QuintonicService{
 
     @Override
     public List<PlayerDataDTO> getPlayersByName(String name) {
-        List<PlayerDataDTO> playerDataDTOList = biwengerClientService.getPlayersByName(name);
-        return playerDataDTOList.stream().filter(playerDataDTO -> playerDataDTO.getName().contains(name)).
+        List<PlayerDataDTO> players = (List<PlayerDataDTO>)playersDataService.getPlayers().values().stream().collect(Collectors.toList());
+        return  players.stream().filter(playerDataDTO -> playerDataDTO.getName().toUpperCase().contains(name.toUpperCase())).
                 map(playerDataDTO -> setPlayerScores(playerDataDTO)).
                 map(playerDataDTO -> setPlayerFinalScore(playerDataDTO)).
                 map(playerDataDTO -> setBuyRecommendedAction(playerDataDTO)).
