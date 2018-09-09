@@ -42,6 +42,7 @@ public class EngineAveragePricePerPosition {
     public Integer getAveragePricePerPosition(String position) {
 
             List<PlayerDataDTO> playerDataDTOList = (List<PlayerDataDTO>) playersDataService.getPlayers().values().stream().collect(Collectors.toList());
+            //TODO move to PlayersDataService
             this.setAveragePricePerGoalkeeper(
                     engineCalculateAveragePricePerPosition.calculate(playerDataDTOList, GOALKEEPER));
             this.setAveragePricePerDefender(
