@@ -3,12 +3,10 @@ package quintonic.service;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import quintonic.PlayersDataService;
+import quintonic.data.PlayersDataService;
 import quintonic.dto.BonusDTO;
 import quintonic.dto.OfferDTO;
 import quintonic.dto.PlayerDataDTO;
-import quintonic.engine.market.EngineAveragePricePerPosition;
-import quintonic.engine.market.EngineCalculateAveragePricePerPosition;
 import quintonic.engine.player.EngineCalculateAverageFitnessScore;
 import quintonic.engine.player.EngineCalculateAveragePriceScore;
 import quintonic.engine.player.EngineCalculateMatchesPlayedScore;
@@ -22,13 +20,7 @@ import java.util.stream.Collectors;
 public class QuintonicServiceImpl implements QuintonicService{
 
     @Autowired
-    EngineAveragePricePerPosition engineAveragePricePerPosition;
-
-    @Autowired
     EngineCalculateAverageFitnessScore engineCalculateAverageFitnessScore;
-
-    @Autowired
-    EngineCalculateAveragePricePerPosition engineCalculateAveragePricePerPosition;
 
     @Autowired
     EngineCalculateAveragePriceScore engineCalculateAveragePriceScore;
@@ -48,30 +40,37 @@ public class QuintonicServiceImpl implements QuintonicService{
     @Override
     public List<PlayerDataDTO> getMarketScore(String bearer, String league) {
         List<PlayerDataDTO> playerDataDTOList = biwengerClientService.getMarketPlayers(bearer, league);
-        List<PlayerDataDTO> marketEvaluatedPlayersList = playerDataDTOList.
+        return playerDataDTOList.
                 stream().
                 map(playerDataDTO -> (PlayerDataDTO)playersDataService.getPlayers().get(playerDataDTO.getId())).
                 map(playerDataDTO -> setPlayerScores(playerDataDTO)).
                 map(playerDataDTO -> setPlayerFinalScore(playerDataDTO)).
                 map(playerDataDTO -> setBuyRecommendedAction(playerDataDTO)).
                 collect(Collectors.toList());
-        return marketEvaluatedPlayersList;
     }
 
     @Override
     public List<PlayerDataDTO> getUserPlayersScore(String bearer, String league) {
         List<PlayerDataDTO> playerDataDTOList = biwengerClientService.getUserPlayers(bearer, league);
-        //fillPlayerScores(playerDataDTOList);
-        evaluatePlayersForSell(playerDataDTOList);
-        return playerDataDTOList;
+        return playerDataDTOList.
+                stream().
+                map(playerDataDTO -> (PlayerDataDTO)playersDataService.getPlayers().get(playerDataDTO.getId())).
+                map(playerDataDTO -> (PlayerDataDTO)playersDataService.getPlayers().get(playerDataDTO.getId())).
+                map(playerDataDTO -> setPlayerScores(playerDataDTO)).
+                map(playerDataDTO -> setPlayerFinalScore(playerDataDTO)).
+                map(playerDataDTO -> setSellRecommendedAction(playerDataDTO)).
+                map(playerDataDTO -> setSellRecommendedActionDetails(playerDataDTO)).
+                collect(Collectors.toList());
     }
 
     @Override
     public List<PlayerDataDTO> getPlayersByName(String name) {
         List<PlayerDataDTO> playerDataDTOList = biwengerClientService.getPlayersByName(name);
-        //fillPlayerScores(playerDataDTOList);
-        evaluatePlayersForBuy(playerDataDTOList);
-        return playerDataDTOList;
+        return playerDataDTOList.stream().filter(playerDataDTO -> playerDataDTO.getName().contains(name)).
+                map(playerDataDTO -> setPlayerScores(playerDataDTO)).
+                map(playerDataDTO -> setPlayerFinalScore(playerDataDTO)).
+                map(playerDataDTO -> setBuyRecommendedAction(playerDataDTO)).
+                collect(Collectors.toList());
     }
 
     @Override
@@ -136,104 +135,53 @@ public class QuintonicServiceImpl implements QuintonicService{
         return playerDataEvaluated;
     }
 
-    private void evaluatePlayersForBuy(List<PlayerDataDTO> playerDataDTOList) {
-        Map players = playersDataService.getPlayers();
-        playerDataDTOList.stream().forEach(player -> {
-            PlayerDataDTO fullPlayer = (PlayerDataDTO) players.get(player.getId());
-            if ("injured".equals(fullPlayer.getFitness().get(0))) {
-                player.setRecommendedAction("No comprar, lesionado");
-            } else {
-                double finalScore = (player.getAverageFitnessScore() +
-                        player.getAveragePriceScore() +
-                        player.getPriceIndicatorScore() +
-                        player.getMatchesPlayedScore()) / 4;
-                player.setScore(finalScore);
-                if (finalScore < 0.25){
-                    player.setRecommendedAction("¡No comprar!");
-                } else if (finalScore <= 0.5){
-                    player.setRecommendedAction("No comprar");
-                } else if (finalScore <= 0.75){
-                    player.setRecommendedAction("Evaluar");
-                } else if (finalScore > 0.75){
-                    player.setRecommendedAction("Comprar");
-                }
-            }
-        });
+    private PlayerDataDTO setSellRecommendedAction(PlayerDataDTO playerDataDTO) {
+        PlayerDataDTO playerDataEvaluated = new PlayerDataDTO();
+        BeanUtils.copyProperties(playerDataDTO, playerDataEvaluated);
+        if ("injured".equals(playerDataDTO.getFitness().get(0))) {
+            playerDataEvaluated.setRecommendedAction("Lesionado");
+        } else if (playerDataDTO.getScore() < 0.25){
+            playerDataEvaluated.setRecommendedAction("No alinear. Vender jugador.");
+        } else if (playerDataDTO.getScore() < 0.5){
+            playerDataEvaluated.setRecommendedAction("Vender jugador.");
+        } else if (playerDataDTO.getScore() <= 0.75){
+            playerDataEvaluated.setRecommendedAction("Alinear. Evaluar posible venta.");
+        } else if (playerDataDTO.getScore() > 0.75){
+            playerDataEvaluated.setRecommendedAction("Alinear y mantener.");
+        }
+        return playerDataEvaluated;
     }
 
-    private void evaluatePlayersForSell(List<PlayerDataDTO> playerDataDTOList) {
-        playerDataDTOList.stream().forEach(player -> {
-            if ("injured".equals(player.getFitness().get(0))) {
-                player.setRecommendedAction("Lesionado");
-            } else {
-                double finalScore = (player.getAverageFitnessScore() +
-                        player.getAveragePriceScore() +
-                        player.getPriceIndicatorScore() +
-                        player.getMatchesPlayedScore()) / 4;
-                player.setScore(finalScore);
+    private PlayerDataDTO setSellRecommendedActionDetails(PlayerDataDTO playerDataDTO) {
+        PlayerDataDTO playerDataEvaluated = new PlayerDataDTO();
+        BeanUtils.copyProperties(playerDataDTO, playerDataEvaluated);
+        StringBuffer reccommendedActionDetails = new StringBuffer();
 
-                if (finalScore < 0.25){
-                    player.setRecommendedAction("No alinear. Vender jugador.");
-                } else if (finalScore < 0.5){
-                    player.setRecommendedAction("Vender jugador.");
-                } else if (finalScore <= 0.75){
-                    player.setRecommendedAction("Alinear. Evaluar posible venta.");
-                } else if (finalScore > 0.75){
-                    player.setRecommendedAction("Alinear y mantener.");
-                }
-
-                StringBuffer reccommendedActionDetails = new StringBuffer();
-
-                if (player.getPriceIndicatorScore()==1) {
-                    reccommendedActionDetails.append("El precio del jugador está subiendo. ");
-                } else {
-                    reccommendedActionDetails.append("El precion del jugador está bajando. ");
-                }
-                if (player.getAveragePriceScore()==1) {
-                    reccommendedActionDetails.append("Jugador caro, el precion del jugador es más alto que el de la media por puntos en su posición. ");
-                } else {
-                    reccommendedActionDetails.append("Jugador barato, el precio del jugador es más bajo que el de la media por puntos en su posición.");
-                }
-                if (player.getMatchesPlayedScore()==1) {
-                    reccommendedActionDetails.append("Juega todo.");
-                }else if (player.getMatchesPlayedScore()>=0.75) {
-                    reccommendedActionDetails.append("Juega casi todo.");
-                }else if (player.getMatchesPlayedScore()>=0.5) {
-                    reccommendedActionDetails.append("No juega mucho, evaluar su posible alineación. ");
-                }else if (player.getMatchesPlayedScore()<0.5) {
-                    reccommendedActionDetails.append("No juega suficiente, considera su venta. ");
-                }
-                if (player.getAverageFitnessScore()==1) {
-                    reccommendedActionDetails.append("El jugador está en un buen momento de forma. Mantener en alineación. ");
-                } else {
-                    reccommendedActionDetails.append("No está en su mejor momento. ");
-                }
-                player.setRecommendedActionDetails(reccommendedActionDetails.toString());
-            }
-        });
+        if (playerDataDTO.getPriceIndicatorScore()==1) {
+            reccommendedActionDetails.append("El precio del jugador está subiendo. ");
+        } else {
+            reccommendedActionDetails.append("El precion del jugador está bajando. ");
+        }
+        if (playerDataDTO.getAveragePriceScore()==1) {
+            reccommendedActionDetails.append("Jugador caro, el precion del jugador es más alto que el de la media por puntos en su posición. ");
+        } else {
+            reccommendedActionDetails.append("Jugador barato, el precio del jugador es más bajo que el de la media por puntos en su posición.");
+        }
+        if (playerDataDTO.getMatchesPlayedScore()==1) {
+            reccommendedActionDetails.append("Juega todo.");
+        }else if (playerDataDTO.getMatchesPlayedScore()>=0.75) {
+            reccommendedActionDetails.append("Juega casi todo.");
+        }else if (playerDataDTO.getMatchesPlayedScore()>=0.5) {
+            reccommendedActionDetails.append("No juega mucho, evaluar su posible alineación. ");
+        }else if (playerDataDTO.getMatchesPlayedScore()<0.5) {
+            reccommendedActionDetails.append("No juega suficiente, considera su venta. ");
+        }
+        if (playerDataDTO.getAverageFitnessScore()==1) {
+            reccommendedActionDetails.append("El jugador está en un buen momento de forma. Mantener en alineación. ");
+        } else {
+            reccommendedActionDetails.append("No está en su mejor momento. ");
+        }
+        playerDataEvaluated.setRecommendedActionDetails(reccommendedActionDetails.toString());
+        return playerDataEvaluated;
     }
-
-//    public void fillPlayerScores(List<PlayerDataDTO> playerDataDTOList) {
-//        Map players = playersDataService.getPlayers();
-//        playerDataDTOList.stream().forEach(player -> {
-//            Double averageFitnessScore = engineCalculateAverageFitnessScore.getScore((PlayerDataDTO)players.get(player.getId()));
-//            player.setAverageFitnessScore(averageFitnessScore);
-//        });
-//
-//        playerDataDTOList.stream().forEach(player -> {
-//            Double averagePriceScore = engineCalculateAveragePriceScore.getScore((PlayerDataDTO)players.get(player.getId()));
-//            player.setAveragePriceScore(averagePriceScore);
-//        });
-//
-//        playerDataDTOList.stream().forEach(player -> {
-//            Double priceIndicatorScore = engineCalculatePriceIndicatorScore.getScore((PlayerDataDTO)players.get(player.getId()));
-//            player.setPriceIndicatorScore(priceIndicatorScore);
-//        });
-//
-//        playerDataDTOList.stream().forEach(player -> {
-//            Double matchesPlayedScore = engineCalculateMatchesPlayedScore.getScore((PlayerDataDTO)players.get(player.getId()));
-//            player.setMatchesPlayedScore(matchesPlayedScore);
-//        });
-//    }
-
 }

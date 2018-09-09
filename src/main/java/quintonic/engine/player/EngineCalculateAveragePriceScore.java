@@ -2,13 +2,13 @@ package quintonic.engine.player;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import quintonic.data.PlayersDataService;
 import quintonic.dto.PlayerDataDTO;
-import quintonic.engine.market.EngineAveragePricePerPosition;
 
 @Component
 public class EngineCalculateAveragePriceScore implements EngineCalculateScore {
     @Autowired
-    EngineAveragePricePerPosition engineAveragePricePerPosition;
+    PlayersDataService playersDataService;
 
     @Override
     public Double getScore(PlayerDataDTO playerDataDTO) {
@@ -17,7 +17,7 @@ public class EngineCalculateAveragePriceScore implements EngineCalculateScore {
             pricePerPoint = Integer.parseInt(playerDataDTO.getPrice()) / playerDataDTO.getPoints();
         }
         if (pricePerPoint!=0 &&
-                pricePerPoint< engineAveragePricePerPosition.getAveragePricePerPosition(playerDataDTO.getPosition())) {
+                pricePerPoint< playersDataService.getAveragePricePerPosition(playerDataDTO.getPosition())) {
             return new Double(1);
         } else {
             return new Double(0);
