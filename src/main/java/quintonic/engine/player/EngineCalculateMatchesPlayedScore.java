@@ -1,12 +1,14 @@
 package quintonic.engine.player;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import quintonic.dto.PlayerDataDTO;
 
 @Component
-public class EngineCalculateMatchesPlayedScore implements EngineCalculateScore {
-    @Override
-    public Double getScore(PlayerDataDTO playerDataDTO) {
+public class EngineCalculateMatchesPlayedScore {
+    public static PlayerDataDTO setScore(PlayerDataDTO playerDataDTO) {
+        PlayerDataDTO playerDataScored = new PlayerDataDTO();
+        BeanUtils.copyProperties(playerDataDTO, playerDataScored);
         long lScore = playerDataDTO.getFitness().stream().filter(
                 s -> {
                     try{
@@ -18,11 +20,12 @@ public class EngineCalculateMatchesPlayedScore implements EngineCalculateScore {
                     }}
         ).count();
         if (lScore == 5) {
-            return new Double(1);
+            playerDataScored.setMatchesPlayedScore(new Double(1));
         } else if (lScore == 4) {
-            return new Double(0.75);
+            playerDataScored.setMatchesPlayedScore(new Double(0.75));
         } else {
-            return new Double(0);
+            playerDataScored.setMatchesPlayedScore(new Double(0));
         }
+        return playerDataDTO;
     }
 }

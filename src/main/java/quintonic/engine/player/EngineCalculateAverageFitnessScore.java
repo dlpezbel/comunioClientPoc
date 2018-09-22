@@ -1,28 +1,30 @@
 package quintonic.engine.player;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import quintonic.dto.PlayerDataDTO;
 
 import java.util.OptionalDouble;
 
 @Component
-public class EngineCalculateAverageFitnessScore implements EngineCalculateScore {
-    @Override
-    public Double getScore(PlayerDataDTO playerDataDTO) {
+public class EngineCalculateAverageFitnessScore {
+    public static PlayerDataDTO setScore(PlayerDataDTO playerDataDTO) {
+        PlayerDataDTO playerDataScored = new PlayerDataDTO();
+        BeanUtils.copyProperties(playerDataDTO, playerDataScored);
         double totalAverage = getTotalAverage(playerDataDTO);
         OptionalDouble partialAverageOptional = getPartialAverage(playerDataDTO);
-
+        // TODO refactor if's
         if (partialAverageOptional.isPresent()) {
             if (partialAverageOptional.getAsDouble() > totalAverage) {
-                return new Double(1);
+                playerDataScored.setAverageFitnessScore(new Double(1));
             } else {
-                return new Double(0);
+                playerDataScored.setAverageFitnessScore(new Double(0));
             }
         }
-        return new Double(0);
+        return playerDataScored;
     }
 
-    private double getTotalAverage(PlayerDataDTO playerDataDTO) {
+    private static double getTotalAverage(PlayerDataDTO playerDataDTO) {
         int totalPlayed =  playerDataDTO.getPlayedAway()+playerDataDTO.getPlayedHome();
         if (totalPlayed > 0) {
             return (double) (playerDataDTO.getPoints() / totalPlayed);
@@ -31,13 +33,14 @@ public class EngineCalculateAverageFitnessScore implements EngineCalculateScore 
         }
     }
 
-    private OptionalDouble getPartialAverage(PlayerDataDTO playerDataDTO) {
-        return playerDataDTO.getFitness().stream().filter(s -> {
-            return isInteger(s);
-        }).mapToInt(fitness -> Integer.parseInt(fitness)).average();
+    private static OptionalDouble getPartialAverage(PlayerDataDTO playerDataDTO) {
+        return playerDataDTO.getFitness().
+                stream().
+                filter(EngineCalculateAverageFitnessScore::isInteger).
+                mapToInt(fitness -> Integer.parseInt(fitness)).average();
     }
 
-    private boolean isInteger(String s) {
+    private static boolean isInteger(String s) {
         try{
             Integer.parseInt(s);
             return true;

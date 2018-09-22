@@ -25,22 +25,17 @@ public class PlayersDataService {
     private Integer averagePricePerDefender;
     private Integer averagePricePerMidfield;
     private Integer averagePricePerForwarder;
-    private Map players;
-    private Date date;
 
     @Autowired
     private BiwengerClientService biwengerClientService;
 
     public Map getPlayers() {
-        if (date == null || yesterday().after(date)) {
-            date = new Date(System.currentTimeMillis());
-            players = (Map<?,?>) biwengerClientService.getAllPlayers();
-        }
-        return players;
+        // TODO Spring Cacheable
+        return (Map<?,?>) biwengerClientService.getAllPlayers();
     }
 
     public Integer getAveragePricePerPosition(String position) {
-        List<PlayerDataDTO> playerDataDTOList = (List<PlayerDataDTO>) players.values().stream().collect(Collectors.toList());
+        List<PlayerDataDTO> playerDataDTOList = (List<PlayerDataDTO>) getPlayers().values().stream().collect(Collectors.toList());
         this.setAveragePricePerGoalkeeper(
                 this.calculate(playerDataDTOList, GOALKEEPER));
         this.setAveragePricePerDefender(
@@ -79,9 +74,4 @@ public class PlayersDataService {
         return new Integer(pricePerPoint);
     }
 
-    private Date yesterday() {
-        final Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
-        return cal.getTime();
-    }
 }
