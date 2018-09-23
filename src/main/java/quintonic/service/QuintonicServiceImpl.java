@@ -42,8 +42,11 @@ public class QuintonicServiceImpl implements QuintonicService{
         List<PlayerDataDTO> playerDataDTOList = biwengerClientService.getMarketPlayers(bearer, league);
         return playerDataDTOList.
                 stream().
-                map(playerDataDTO -> (PlayerDataDTO)playersDataService.getPlayers().get(playerDataDTO.getId())).
-                map(EngineCalculateAverageFitnessScore::setScore).
+                map(playerDataDTO -> {
+                    PlayerDataDTO fullPlayerDataDTO = (PlayerDataDTO)playersDataService.getPlayers().get(playerDataDTO.getId());
+                    fullPlayerDataDTO.setOwner(playerDataDTO.getOwner());
+                    return fullPlayerDataDTO;
+                }).map(EngineCalculateAverageFitnessScore::setScore).
                 map(EngineCalculateAveragePriceScore::setScore).
                 map(EngineCalculatePriceIndicatorScore::setScore).
                 map(EngineCalculateMatchesPlayedScore::setScore).
