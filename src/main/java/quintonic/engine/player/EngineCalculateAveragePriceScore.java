@@ -8,8 +8,13 @@ import quintonic.dto.PlayerDataDTO;
 
 @Component
 public class EngineCalculateAveragePriceScore {
-    @Autowired
+
     static PlayersDataService playersDataService;
+
+    @Autowired
+    public EngineCalculateAveragePriceScore(PlayersDataService playersDataService) {
+        this.playersDataService = playersDataService;
+    }
 
     public static PlayerDataDTO setScore(PlayerDataDTO playerDataDTO) {
         PlayerDataDTO playerDataScored = new PlayerDataDTO();

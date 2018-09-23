@@ -26,6 +26,6 @@ public class EngineCalculateMatchesPlayedScore {
         } else {
             playerDataScored.setMatchesPlayedScore(new Double(0));
         }
-        return playerDataDTO;
+        return playerDataScored;
     }
 }

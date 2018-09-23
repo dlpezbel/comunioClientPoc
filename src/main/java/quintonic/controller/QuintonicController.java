@@ -49,28 +49,12 @@ public class QuintonicController {
         return playerTransformer.transformListToPlayerListResponseDTO(playerDataDTOList);
     }
 
-    @RequestMapping("/bot/league/{idLeague}/market/players")
-    @ResponseBody
-    List<SimplePlayerDataResponseDTO> getMarketPlayersScoreBot(@RequestHeader(value="Authorization") String bearer,
-                                                        @PathVariable(value="idLeague") String league) {
-        List<PlayerDataDTO> playerDataDTOList = quintonicService.getMarketScore(bearer, league);
-        return playerTransformer.transformListToSimplePlayerListResponseDTO(playerDataDTOList);
-    }
-
     @RequestMapping("/league/{idLeague}/user/players")
     @ResponseBody
     List<FullPlayerDataResponseDTO> getUserPlayersScore(@RequestHeader(value="Authorization") String bearer,
                                                         @PathVariable(value="idLeague") String league) {
         List<PlayerDataDTO> playerDataDTOList = quintonicService.getUserPlayersScore(bearer,league);
         return playerTransformer.transformListToPlayerListResponseDTO(playerDataDTOList);
-    }
-
-    @RequestMapping("bot/league/{idLeague}/user/players")
-    @ResponseBody
-    List<SimplePlayerDataResponseDTO> getUserPlayersScoreBot(@RequestHeader(value="Authorization") String bearer,
-                                                        @RequestHeader(value="X-League") String league) {
-        List<PlayerDataDTO> playerDataDTOList = quintonicService.getUserPlayersScore(bearer,league);
-        return playerTransformer.transformListToSimplePlayerListResponseDTO(playerDataDTOList);
     }
 
     @RequestMapping( value = "/players",params = {"name"}, method = GET )
@@ -104,7 +88,6 @@ public class QuintonicController {
                                      @PathVariable(value="idLeague") String league) {
         return quintonicService.getPlayerOffers(bearer,league);
     }
-
 
     @RequestMapping("/league/{idLeague}/users/money")
     @ResponseBody
