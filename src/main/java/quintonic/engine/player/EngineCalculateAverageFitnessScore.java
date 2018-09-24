@@ -6,24 +6,25 @@ import quintonic.dto.PlayerDataDTO;
 
 import java.util.Optional;
 import java.util.OptionalDouble;
-import java.util.function.DoubleConsumer;
+import java.util.function.Function;
 
 @Component
 public class EngineCalculateAverageFitnessScore {
     public static PlayerDataDTO setScore(PlayerDataDTO playerDataDTO) {
         PlayerDataDTO playerDataScored = new PlayerDataDTO();
         BeanUtils.copyProperties(playerDataDTO, playerDataScored);
-        Optional optTotalAverage = getTotalAverage(playerDataDTO);
-        Optional partialAverageOptional = getPartialAverage(playerDataDTO);
-
-        // TODO refactor if's
-        if (partialAverageOptional.isPresent() &&
-                (Double)partialAverageOptional.get() > (Double)optTotalAverage.get()) {
-                playerDataScored.setAverageFitnessScore(new Double(1));
-        } else {
-            playerDataScored.setAverageFitnessScore(new Double(0));
-        }
+        Optional<Double> optScore = getPartialAverage(playerDataDTO).
+                flatMap(partial -> getTotalAverage(playerDataDTO).
+                        flatMap(getScoreFunction(partial)));
+        playerDataScored.setAverageFitnessScore(optScore.orElse(new Double(0)));
         return playerDataScored;
+    }
+
+    private static Function<Double, Optional<Double>> getScoreFunction(Double partial) {
+        return total -> {
+            if (partial>total) return Optional.of(new Double(1));
+            else return Optional.of(new Double(0));
+        };
     }
 
     private static Optional<Double> getTotalAverage(PlayerDataDTO playerDataDTO) {
@@ -35,22 +36,13 @@ public class EngineCalculateAverageFitnessScore {
         }
     }
 
-    private static Optional getPartialAverage(PlayerDataDTO playerDataDTO) {
+    private static Optional<Double> getPartialAverage(PlayerDataDTO playerDataDTO) {
         OptionalDouble optAverage = playerDataDTO.getFitness().
                 stream().
-                filter(EngineCalculateAverageFitnessScore::isInteger).
+                filter(EngineGlobalScore::isInteger).
                 mapToInt(fitness -> Integer.parseInt(fitness)).average();
         return optAverage.isPresent() ?
                 Optional.of(optAverage.getAsDouble()) : Optional.empty();
     }
 
-    private static boolean isInteger(String s) {
-        try{
-            Integer.parseInt(s);
-            return true;
-        }catch(NumberFormatException e){
-            //not int
-            return false;
-        }
-    }
 }

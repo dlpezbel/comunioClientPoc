@@ -4,11 +4,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import quintonic.dto.PlayerDataDTO;
 
-import java.util.OptionalDouble;
-
 @Component
 public class EngineGlobalScore {
     public static PlayerDataDTO setPlayerFinalScore(PlayerDataDTO playerDataDTO) {
+        if (playerDataDTO == null) return playerDataDTO;
         PlayerDataDTO playerDataScored = new PlayerDataDTO();
         BeanUtils.copyProperties(playerDataDTO,playerDataScored);
         double finalScore = (playerDataScored.getAverageFitnessScore() +
@@ -20,6 +19,7 @@ public class EngineGlobalScore {
     }
 
     public static PlayerDataDTO setBuyRecommendedAction(PlayerDataDTO playerDataDTO) {
+        if (playerDataDTO == null) return playerDataDTO;
         PlayerDataDTO playerDataEvaluated = new PlayerDataDTO();
         BeanUtils.copyProperties(playerDataDTO,playerDataEvaluated);
         if ("injured".equals(playerDataEvaluated.getFitness().get(0))) {
@@ -84,5 +84,15 @@ public class EngineGlobalScore {
         }
         playerDataEvaluated.setRecommendedActionDetails(reccommendedActionDetails.toString());
         return playerDataEvaluated;
+    }
+
+    public static boolean isInteger(String s) {
+        try{
+            Integer.parseInt(s);
+            return true;
+        }catch(NumberFormatException e){
+            //not int
+            return false;
+        }
     }
 }

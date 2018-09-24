@@ -1,6 +1,5 @@
 package quintonic.service;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import quintonic.data.PlayersDataService;
@@ -39,12 +38,15 @@ public class QuintonicServiceImpl implements QuintonicService{
 
     @Override
     public List<PlayerDataDTO> getMarketScore(String bearer, String league) {
-        List<PlayerDataDTO> playerDataDTOList = biwengerClientService.getMarketPlayers(bearer, league);
-        return playerDataDTOList.
+        List<PlayerDataDTO> marketPlayers = biwengerClientService.getMarketPlayers(bearer, league);
+        Map<String, PlayerDataDTO> leaguePlayers = playersDataService.getPlayers();
+        return marketPlayers.
                 stream().
+                filter(playerDataDTO -> leaguePlayers.get(playerDataDTO.getId())!=null).
                 map(playerDataDTO -> {
-                    PlayerDataDTO fullPlayerDataDTO = (PlayerDataDTO)playersDataService.getPlayers().get(playerDataDTO.getId());
-                    fullPlayerDataDTO.setOwner(playerDataDTO.getOwner());
+                    PlayerDataDTO fullPlayerDataDTO = leaguePlayers.get(playerDataDTO.getId());
+                    // TODO set owner
+                    //fullPlayerDataDTO.setOwner(playerDataDTO.getOwner());
                     return fullPlayerDataDTO;
                 }).map(EngineCalculateAverageFitnessScore::setScore).
                 map(EngineCalculateAveragePriceScore::setScore).
@@ -58,7 +60,9 @@ public class QuintonicServiceImpl implements QuintonicService{
     @Override
     public List<PlayerDataDTO> getUserPlayersScore(String bearer, String league) {
         List<PlayerDataDTO> playerDataDTOList = biwengerClientService.getUserPlayers(bearer, league);
+        Map<String, PlayerDataDTO> leaguePlayers = playersDataService.getPlayers();
         return playerDataDTOList.stream().
+                filter(playerDataDTO -> leaguePlayers.get(playerDataDTO.getId())!=null).
                 map(playerDataDTO -> (PlayerDataDTO)playersDataService.getPlayers().get(playerDataDTO.getId())).
                 map(EngineCalculateAverageFitnessScore::setScore).
                 map(EngineCalculateAveragePriceScore::setScore).
@@ -73,7 +77,8 @@ public class QuintonicServiceImpl implements QuintonicService{
     @Override
     public List<PlayerDataDTO> getPlayersByName(String name) {
         List<PlayerDataDTO> players = (List<PlayerDataDTO>)playersDataService.getPlayers().values().stream().collect(Collectors.toList());
-        return  players.stream().filter(playerDataDTO -> playerDataDTO.getName().toUpperCase().contains(name.toUpperCase())).
+        return  players.stream().
+                filter(playerDataDTO -> playerDataDTO.getName().toUpperCase().contains(name.toUpperCase())).
                 map(EngineCalculateAverageFitnessScore::setScore).
                 map(EngineCalculateAveragePriceScore::setScore).
                 map(EngineCalculatePriceIndicatorScore::setScore).
