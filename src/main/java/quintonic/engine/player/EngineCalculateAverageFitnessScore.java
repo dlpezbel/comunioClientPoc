@@ -4,6 +4,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import quintonic.dto.PlayerDataDTO;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.function.Function;
@@ -37,7 +39,8 @@ public class EngineCalculateAverageFitnessScore {
     }
 
     private static Optional<Double> getPartialAverage(PlayerDataDTO playerDataDTO) {
-        OptionalDouble optAverage = playerDataDTO.getFitness().
+        Optional<List<String>> optionalFitnessList = Optional.ofNullable(playerDataDTO.getFitness());
+        OptionalDouble optAverage = optionalFitnessList.orElse(new ArrayList<>()).
                 stream().
                 filter(EngineGlobalScore::isInteger).
                 mapToInt(fitness -> Integer.parseInt(fitness)).average();
