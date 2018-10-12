@@ -30,9 +30,11 @@ public class EngineCalculateAverageFitnessScore {
     }
 
     private static Optional<Double> getTotalAverage(PlayerDataDTO playerDataDTO) {
-        int totalPlayed =  playerDataDTO.getPlayedAway()+playerDataDTO.getPlayedHome();
-        if (totalPlayed > 0) {
-            return Optional.of((double) (playerDataDTO.getPoints() / totalPlayed));
+        Optional<Integer> optPlayedAway = Optional.ofNullable(playerDataDTO.getPlayedAway());
+        Optional<Integer> optPlayedHome = Optional.ofNullable(playerDataDTO.getPlayedHome());
+        if (optPlayedAway.isPresent() || optPlayedHome.isPresent()) {
+            Integer totalPlayed =  optPlayedAway.orElse(0)+optPlayedHome.orElse(0);
+            return Optional.of((double) (Optional.ofNullable(playerDataDTO.getPoints()).orElse(0) / totalPlayed));
         } else {
             return Optional.empty();
         }

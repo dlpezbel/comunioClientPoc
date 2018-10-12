@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = Quintonic.class)
-public class BiwengerClientServiceImplTest {
+public class BiwengerClientServiceImplTestIT {
     @Autowired
     BiwengerClientServiceImpl biwengerClientService;
 
