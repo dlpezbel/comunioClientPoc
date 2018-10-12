@@ -11,10 +11,10 @@ public class EngineGlobalScore {
     public static PlayerDataDTO setPlayerFinalScore(PlayerDataDTO playerDataDTO) {
         PlayerDataDTO playerDataScored = new PlayerDataDTO();
         BeanUtils.copyProperties(playerDataDTO,playerDataScored);
-        double finalScore = Optional.ofNullable(playerDataScored.getAverageFitnessScore()).orElse(0.0) +
+        double finalScore = (Optional.ofNullable(playerDataScored.getAverageFitnessScore()).orElse(0.0) +
                 Optional.ofNullable(playerDataScored.getAveragePriceScore()).orElse(0.0) +
                 Optional.ofNullable(playerDataScored.getPriceIndicatorScore()).orElse(0.0) +
-                Optional.ofNullable(playerDataScored.getMatchesPlayedScore()).orElse(0.0) / 4;
+                Optional.ofNullable(playerDataScored.getMatchesPlayedScore()).orElse(0.0)) / 4;
         playerDataScored.setScore(finalScore);
         return playerDataScored;
     }

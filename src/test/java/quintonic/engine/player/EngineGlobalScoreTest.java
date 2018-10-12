@@ -17,6 +17,7 @@ public class EngineGlobalScoreTest {
         PlayerDataDTO playerDataDTO = new PlayerDataDTO();
         PlayerDataDTO playerScoredDataDTO = EngineGlobalScore.setPlayerFinalScore(playerDataDTO);
         Assert.assertEquals(playerScoredDataDTO.getScore(),new Double(0.0));
+        Assert.assertTrue(playerScoredDataDTO.getScore()<=1.0 && playerScoredDataDTO.getScore()>=0);
     }
 
     @Test
@@ -26,6 +27,7 @@ public class EngineGlobalScoreTest {
         PlayerDataDTO playerScoredDataDTO = EngineGlobalScore.setPlayerFinalScore(playerDataDTO);
         Assert.assertNotNull(playerScoredDataDTO.getScore());
         Assert.assertNotEquals(playerScoredDataDTO.getScore(),new Double(0.0));
+        Assert.assertTrue(playerScoredDataDTO.getScore()<=1.0 && playerScoredDataDTO.getScore()>=0);
     }
 
     @Test
@@ -38,5 +40,6 @@ public class EngineGlobalScoreTest {
         PlayerDataDTO playerScoredDataDTO = EngineGlobalScore.setPlayerFinalScore(playerDataDTO);
         Assert.assertNotNull(playerScoredDataDTO.getScore());
         Assert.assertNotEquals(playerScoredDataDTO.getScore(),new Double(0.0));
+        Assert.assertTrue(playerScoredDataDTO.getScore()<=1.0 && playerScoredDataDTO.getScore()>=0);
     }
 }
