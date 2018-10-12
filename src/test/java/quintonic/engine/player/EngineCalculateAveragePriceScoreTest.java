@@ -29,7 +29,7 @@ public class EngineCalculateAveragePriceScoreTest {
     }
 
     @Test
-    public void whenPlayerHasPriceButNoPoints_thenScoreIsCalculated() {
+    public void whenPlayerHasPriceButNoPoints_thenScoreIsCalculatedButIsZero() {
         PlayerDataDTO playerDataDTO = new PlayerDataDTO();
         playerDataDTO.setPrice("160000");
         playerDataDTO.setPosition(PlayersDataService.DEFENDER);

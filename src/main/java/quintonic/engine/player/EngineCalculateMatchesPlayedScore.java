@@ -4,12 +4,20 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import quintonic.dto.PlayerDataDTO;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalDouble;
+
 @Component
 public class EngineCalculateMatchesPlayedScore {
     public static PlayerDataDTO setScore(PlayerDataDTO playerDataDTO) {
         PlayerDataDTO playerDataScored = new PlayerDataDTO();
         BeanUtils.copyProperties(playerDataDTO, playerDataScored);
-        long lScore = playerDataDTO.getFitness().stream().filter(
+
+        Optional<List<String>> optionalFitnessList = Optional.ofNullable(playerDataDTO.getFitness());
+
+        long lScore = optionalFitnessList.orElse(new ArrayList<>()).stream().filter(
                 s -> {
                     try{
                         Integer.parseInt(s);
