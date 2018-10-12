@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import quintonic.data.PlayersDataService;
 import quintonic.dto.PlayerDataDTO;
 
+import java.util.Optional;
+
 @Component
 public class EngineCalculateAveragePriceScore {
 
@@ -20,7 +22,7 @@ public class EngineCalculateAveragePriceScore {
         PlayerDataDTO playerDataScored = new PlayerDataDTO();
         BeanUtils.copyProperties(playerDataDTO, playerDataScored);
         int pricePerPoint = 0;
-        if (playerDataDTO.getPoints()>0) {
+        if (Optional.ofNullable(playerDataDTO.getPoints()).orElse(0)>0) {
             pricePerPoint = Integer.parseInt(playerDataDTO.getPrice()) / playerDataDTO.getPoints();
         }
         if (pricePerPoint!=0 &&
@@ -31,4 +33,11 @@ public class EngineCalculateAveragePriceScore {
         }
         return playerDataScored;
     }
+
+    // For testing purposes
+    public static void setPlayersDataService(PlayersDataService playersDataService) {
+        EngineCalculateAveragePriceScore.playersDataService = playersDataService;
+    }
+
+
 }
