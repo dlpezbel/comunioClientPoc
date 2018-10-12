@@ -4,16 +4,17 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import quintonic.dto.PlayerDataDTO;
 
+import java.util.Optional;
+
 @Component
 public class EngineGlobalScore {
     public static PlayerDataDTO setPlayerFinalScore(PlayerDataDTO playerDataDTO) {
-        if (playerDataDTO == null) return playerDataDTO;
         PlayerDataDTO playerDataScored = new PlayerDataDTO();
         BeanUtils.copyProperties(playerDataDTO,playerDataScored);
-        double finalScore = (playerDataScored.getAverageFitnessScore() +
-                playerDataScored.getAveragePriceScore() +
-                playerDataScored.getPriceIndicatorScore() +
-                playerDataScored.getMatchesPlayedScore()) / 4;
+        double finalScore = Optional.ofNullable(playerDataScored.getAverageFitnessScore()).orElse(0.0) +
+                Optional.ofNullable(playerDataScored.getAveragePriceScore()).orElse(0.0) +
+                Optional.ofNullable(playerDataScored.getPriceIndicatorScore()).orElse(0.0) +
+                Optional.ofNullable(playerDataScored.getMatchesPlayedScore()).orElse(0.0) / 4;
         playerDataScored.setScore(finalScore);
         return playerDataScored;
     }
