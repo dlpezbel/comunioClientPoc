@@ -1,234 +1,272 @@
 package quintonic.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import quintonic.dto.*;
-import quintonic.dto.biwenger.*;
+import quintonic.dto.AccountDTO;
+import quintonic.dto.AccountDataDTO;
+import quintonic.dto.BonusDTO;
+import quintonic.dto.LeagueDataDTO;
+import quintonic.dto.MarketDTO;
+import quintonic.dto.OfferDTO;
+import quintonic.dto.PlayerDataDTO;
+import quintonic.dto.PlayersDTO;
+import quintonic.dto.TokenDTO;
+import quintonic.dto.UserDTO;
+import quintonic.dto.UserDataDTO;
+import quintonic.dto.biwenger.NewsRequestDTO;
+import quintonic.dto.biwenger.OfferResponseDTO;
+import quintonic.dto.biwenger.PlayerDataRequestDTO;
+import quintonic.dto.biwenger.PlayerRequestDTO;
+import quintonic.dto.biwenger.TransferMarketDataRequestDTO;
+import quintonic.dto.biwenger.TransferMarketRequestDTO;
 import quintonic.engine.player.EngineCalculateAverageFitnessScore;
 import quintonic.service.helper.TransferHelper;
 import quintonic.transformer.PlayerTransformer;
 import quintonic.transformer.TransferTransformer;
 
-import java.util.*;
-
 @Service
 public class BiwengerClientServiceImpl implements BiwengerClientService {
-    private static final String PLAYER_NAME = "player_name";
 
-    @Autowired
-    EngineCalculateAverageFitnessScore engineCalculateAverageFitnessScore;
+  private static final String PLAYER_NAME = "player_name";
 
-    @Autowired
-    PlayerTransformer playerTransformer;
+  @Autowired
+  EngineCalculateAverageFitnessScore engineCalculateAverageFitnessScore;
 
-    @Autowired
-    TransferHelper transferHelper;
+  @Autowired
+  PlayerTransformer playerTransformer;
 
-    @Autowired
-    TransferTransformer transferTransformer;
+  @Autowired
+  TransferHelper transferHelper;
 
-    private RestTemplate getRestTemplate() {
-        RestTemplate restTemplate = new RestTemplate();
-        return restTemplate;
-    }
+  @Autowired
+  TransferTransformer transferTransformer;
 
-    @Override
-    public PlayerDataDTO getPlayerByName(String playerName)
-    {
-        final String uri = "https://biwenger.as.com/api/v1/players/la-liga/{"+ PLAYER_NAME +"}";
+  private RestTemplate getRestTemplate() {
+    RestTemplate restTemplate = new RestTemplate();
+    return restTemplate;
+  }
 
-        Map<String, String> params = new HashMap<>();
-        params.put(PLAYER_NAME, playerName);
+  @Override
+  public PlayerDataDTO getPlayerByName(String playerName) {
+    final String uri = "https://biwenger.as.com/api/v1/players/la-liga/{" + PLAYER_NAME + "}";
 
-        RestTemplate restTemplate = getRestTemplate();
-        PlayerRequestDTO resultPlayer = restTemplate.getForObject(uri, PlayerRequestDTO.class, params);
-        return playerTransformer.transformPlayerRequestToPlayerDTO(resultPlayer.getData());
-    }
+    Map<String, String> params = new HashMap<>();
+    params.put(PLAYER_NAME, playerName);
 
-    @Override
-    public TokenDTO login(UserDTO userDTO) {
-        final String uri = "https://biwenger.as.com/api/v1/auth/login";
-        RestTemplate restTemplate = getRestTemplate();
-        HttpEntity<UserDTO> request = new HttpEntity<>(new UserDTO(userDTO.getEmail(),userDTO.getPassword()));
+    RestTemplate restTemplate = getRestTemplate();
+    PlayerRequestDTO resultPlayer = restTemplate.getForObject(uri, PlayerRequestDTO.class, params);
+    return playerTransformer.transformPlayerRequestToPlayerDTO(resultPlayer.getData());
+  }
 
-        TokenDTO tokenDTO = restTemplate.postForObject(uri,request,TokenDTO.class);
+  @Override
+  public TokenDTO login(UserDTO userDTO) {
+    final String uri = "https://biwenger.as.com/api/v1/auth/login";
+    RestTemplate restTemplate = getRestTemplate();
+    HttpEntity<UserDTO> request = new HttpEntity<>(
+        new UserDTO(userDTO.getEmail(), userDTO.getPassword()));
 
-        return tokenDTO;
-    }
+    TokenDTO tokenDTO = restTemplate.postForObject(uri, request, TokenDTO.class);
 
-    @Override
-    public List<PlayerDataDTO> getMarketPlayers(String bearer, String league) {
-        final String uri = "https://biwenger.as.com/api/v2/market";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+    return tokenDTO;
+  }
 
-        headers.set("Authorization", bearer);
-        headers.set("X-League", league);
+  @Override
+  public List<PlayerDataDTO> getMarketPlayers(String bearer, String league) {
+    final String uri = "https://biwenger.as.com/api/v2/market";
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<MarketDTO> result = getRestTemplate().exchange(uri, HttpMethod.GET, entity, MarketDTO.class);
+    headers.set("Authorization", bearer);
+    headers.set("X-League", league);
 
-        MarketDTO marketDTO = result.getBody();
-        List<PlayerDataDTO> playerDataDTOList = getPlayerListFromMarket(marketDTO);
-        return playerDataDTOList;
-    }
+    HttpEntity<String> entity = new HttpEntity<>(headers);
+    ResponseEntity<MarketDTO> result = getRestTemplate()
+        .exchange(uri, HttpMethod.GET, entity, MarketDTO.class);
 
-    public Map getAllPlayers() {
-        final String uri = "https://cf.biwenger.com/api/v2/competitions/la-liga/data?score=1";
-        CloseableHttpClient httpClient = HttpClients.custom().setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
+    MarketDTO marketDTO = result.getBody();
+    List<PlayerDataDTO> playerDataDTOList = getPlayerListFromMarket(marketDTO);
+    return playerDataDTOList;
+  }
 
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-        requestFactory.setHttpClient(httpClient);
+  public Map getAllPlayers() {
+    final String uri = "https://cf.biwenger.com/api/v2/competitions/la-liga/data?score=1";
+    CloseableHttpClient httpClient = HttpClients.custom()
+        .setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
 
-        RestTemplate restTemplate = new RestTemplate(requestFactory);
+    HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+    requestFactory.setHttpClient(httpClient);
 
-        LeagueDataDTO leagueDataDTO = restTemplate.getForObject(uri, LeagueDataDTO.class);
-        Map players = leagueDataDTO.getData().getPlayers();
-        return players;
-    }
+    RestTemplate restTemplate = new RestTemplate(requestFactory);
 
-    @Override
-    public List<PlayerDataDTO> getUserPlayers(String bearer, String league) {
-        final String uri = "https://biwenger.as.com/api/v1/user?fields=*,players(*,fitness)";
+    LeagueDataDTO leagueDataDTO = restTemplate.getForObject(uri, LeagueDataDTO.class);
+    Map players = leagueDataDTO.getData().getPlayers();
+    return players;
+  }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", bearer);
-        headers.set("X-League", league);
+  @Override
+  public List<PlayerDataDTO> getUserPlayers(String bearer, String league) {
+    final String uri = "https://biwenger.as.com/api/v1/user?fields=*,players(*,fitness)";
 
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<UserDataDTO> result = getRestTemplate().exchange(uri, HttpMethod.GET, entity, UserDataDTO.class);
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.set("Authorization", bearer);
+    headers.set("X-League", league);
 
-        UserDataDTO userDataDTO = result.getBody();
-        List<PlayerDataRequestDTO> playerDataRequestDTOList = userDataDTO.getData().getPlayers();
-        List<PlayerDataDTO> playerDataDTOList =  playerTransformer.transformPlayerRequestListToPlayerListDTO(playerDataRequestDTOList);
-        playerDataDTOList.stream().forEach(playerDataDTO -> playerDataDTO.setOwner(Optional.empty()));
-        return playerDataDTOList;
-    }
+    HttpEntity<String> entity = new HttpEntity<>(headers);
+    ResponseEntity<UserDataDTO> result = getRestTemplate()
+        .exchange(uri, HttpMethod.GET, entity, UserDataDTO.class);
 
-    public AccountDataDTO getUserAccount(String bearer) {
-        final String uri = "https://biwenger.as.com/api/v1/account";
+    UserDataDTO userDataDTO = result.getBody();
+    List<PlayerDataRequestDTO> playerDataRequestDTOList = userDataDTO.getData().getPlayers();
+    List<PlayerDataDTO> playerDataDTOList = playerTransformer
+        .transformPlayerRequestListToPlayerListDTO(playerDataRequestDTOList);
+    playerDataDTOList.stream().forEach(playerDataDTO -> playerDataDTO.setOwner(Optional.empty()));
+    return playerDataDTOList;
+  }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", bearer);
+  public AccountDataDTO getUserAccount(String bearer) {
+    final String uri = "https://biwenger.as.com/api/v1/account";
 
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<AccountDTO> result = getRestTemplate().exchange(uri, HttpMethod.GET, entity, AccountDTO.class);
-        AccountDTO accountDTO = result.getBody();
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.set("Authorization", bearer);
 
-        AccountDataDTO accountDataDTO = accountDTO.getData();
-        return accountDataDTO;
-    }
+    HttpEntity<String> entity = new HttpEntity<>(headers);
+    ResponseEntity<AccountDTO> result = getRestTemplate()
+        .exchange(uri, HttpMethod.GET, entity, AccountDTO.class);
+    AccountDTO accountDTO = result.getBody();
 
-    @Override
-    public List<PlayerDataDTO> getPlayersByName(String name) {
-        final String uri = "https://biwenger.as.com/api/v1/players/la-liga?&q=" + name + "&limit=1000";
+    AccountDataDTO accountDataDTO = accountDTO.getData();
+    return accountDataDTO;
+  }
 
-        RestTemplate restTemplate = getRestTemplate();
-        PlayersDTO allPlayers = restTemplate.getForObject(uri, PlayersDTO.class);
-        List<PlayerDataDTO> playerDataDTOList =  playerTransformer.transformPlayerRequestListToPlayerListDTO(allPlayers.getData());
-        return playerDataDTOList;
-    }
+  @Override
+  public List<PlayerDataDTO> getPlayersByName(String name) {
+    final String uri = "https://biwenger.as.com/api/v1/players/la-liga?&q=" + name + "&limit=1000";
 
-    @Override
-    public OfferDTO setPlayerOffer(String bearer, String league, OfferDTO offer) {
-        final String uri = "https://biwenger.as.com/api/v1/offers";
-        RestTemplate restTemplate = getRestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", bearer);
-        headers.set("X-League", league);
+    RestTemplate restTemplate = getRestTemplate();
+    PlayersDTO allPlayers = restTemplate.getForObject(uri, PlayersDTO.class);
+    List<PlayerDataDTO> playerDataDTOList = playerTransformer
+        .transformPlayerRequestListToPlayerListDTO(allPlayers.getData());
+    return playerDataDTOList;
+  }
 
-        HttpEntity<OfferDTO> request = new HttpEntity<OfferDTO>(offer, headers);
-        OfferResponseDTO offerResponseDTO = restTemplate.postForObject(uri, request, OfferResponseDTO.class);
-        return transferTransformer.transformToOfferDTO(offerResponseDTO.getData());
-    }
+  @Override
+  public OfferDTO setPlayerOffer(String bearer, String league, OfferDTO offer) {
+    final String uri = "https://biwenger.as.com/api/v1/offers";
+    RestTemplate restTemplate = getRestTemplate();
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.set("Authorization", bearer);
+    headers.set("X-League", league);
 
-    @Override
-    public List<OfferDTO> getPlayerOffers(String bearer, String league) {
-        final String uri = "https://biwenger.as.com/api/v1/market";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+    HttpEntity<OfferDTO> request = new HttpEntity<OfferDTO>(offer, headers);
+    OfferResponseDTO offerResponseDTO = restTemplate
+        .postForObject(uri, request, OfferResponseDTO.class);
+    return transferTransformer.transformToOfferDTO(offerResponseDTO.getData());
+  }
 
-        headers.set("Authorization", bearer);
-        headers.set("X-League", league);
+  @Override
+  public List<OfferDTO> getPlayerOffers(String bearer, String league) {
+    final String uri = "https://biwenger.as.com/api/v1/market";
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<MarketDTO> result = getRestTemplate().exchange(uri, HttpMethod.GET, entity, MarketDTO.class);
-        MarketDTO marketDTO = result.getBody();
+    headers.set("Authorization", bearer);
+    headers.set("X-League", league);
 
-        List<OfferDTO> playerDataDTOList =  transferTransformer.transformOffersRequestListToOfferListDTO(marketDTO.getData().getOffers());
-        return playerDataDTOList;
-    }
+    HttpEntity<String> entity = new HttpEntity<>(headers);
+    ResponseEntity<MarketDTO> result = getRestTemplate()
+        .exchange(uri, HttpMethod.GET, entity, MarketDTO.class);
+    MarketDTO marketDTO = result.getBody();
 
-    @Override
-    public Map<String, Integer> getUsersMoney(String bearer, String league, BonusDTO initialBonus) {
-        final String uri ="https://biwenger.as.com/api/v1/league/news?limit=1000&offset=0&type=transfer,market,exchange,loan,loanReturn";
+    List<OfferDTO> playerDataDTOList = transferTransformer
+        .transformOffersRequestListToOfferListDTO(marketDTO.getData().getOffers());
+    return playerDataDTOList;
+  }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", bearer);
-        headers.set("X-League", league);
+  @Override
+  public Map<String, Integer> getUsersMoney(String bearer, String league, BonusDTO initialBonus) {
+    final String uri = "https://biwenger.as.com/api/v1/league/news?limit=1000&offset=0&type=transfer,market,exchange,loan,loanReturn";
 
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<TransferMarketRequestDTO> result = getRestTemplate().exchange(uri, HttpMethod.GET, entity, TransferMarketRequestDTO.class);
-        List<TransferMarketDataRequestDTO> transferMarketDataRequestDTOList = result.getBody().getData();
-        Map<String,Integer> moneyByUser = transferHelper.processTransfers(transferMarketDataRequestDTOList, initialBonus);
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.set("Authorization", bearer);
+    headers.set("X-League", league);
 
-        NewsRequestDTO newsRequest = getUserBonus(bearer, league);
+    HttpEntity<String> entity = new HttpEntity<>(headers);
+    ResponseEntity<TransferMarketRequestDTO> result = getRestTemplate()
+        .exchange(uri, HttpMethod.GET, entity, TransferMarketRequestDTO.class);
+    List<TransferMarketDataRequestDTO> transferMarketDataRequestDTOList = result.getBody()
+        .getData();
+    Map<String, Integer> moneyByUser = transferHelper
+        .processTransfers(transferMarketDataRequestDTOList, initialBonus);
 
-        transferHelper.addBonusByUser(newsRequest,moneyByUser,initialBonus);
+    NewsRequestDTO newsRequest = getUserBonus(bearer, league);
 
-        return moneyByUser;
-    }
+    transferHelper.addBonusByUser(newsRequest, moneyByUser, initialBonus);
 
-    @Override
-    public void removeOffer(String bearer, String league, String idOffer) {
-        final String uri = "https://biwenger.as.com/api/v1/offers/" + idOffer;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+    return moneyByUser;
+  }
 
-        headers.set("Authorization", bearer);
-        headers.set("X-League", league);
+  @Override
+  public void removeOffer(String bearer, String league, String idOffer) {
+    final String uri = "https://biwenger.as.com/api/v1/offers/" + idOffer;
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        getRestTemplate().exchange(uri, HttpMethod.DELETE, entity, String.class);
-    }
+    headers.set("Authorization", bearer);
+    headers.set("X-League", league);
 
-    private NewsRequestDTO getUserBonus(String bearer, String league) {
-        final String uri2 = "https://biwenger.as.com/api/v1/league/news?limit=40&offset=0&type=roundFinished";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", bearer);
-        headers.set("X-League", league);
+    HttpEntity<String> entity = new HttpEntity<>(headers);
+    getRestTemplate().exchange(uri, HttpMethod.DELETE, entity, String.class);
+  }
 
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<NewsRequestDTO> result2 = getRestTemplate().exchange(uri2, HttpMethod.GET, entity, NewsRequestDTO.class);
+  private NewsRequestDTO getUserBonus(String bearer, String league) {
+    final String uri2 = "https://biwenger.as.com/api/v1/league/news?limit=40&offset=0&type=roundFinished";
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.set("Authorization", bearer);
+    headers.set("X-League", league);
 
-        NewsRequestDTO newsRequest = result2.getBody();
-        return newsRequest;
-    }
+    HttpEntity<String> entity = new HttpEntity<>(headers);
+    ResponseEntity<NewsRequestDTO> result2 = getRestTemplate()
+        .exchange(uri2, HttpMethod.GET, entity, NewsRequestDTO.class);
 
-    private List<PlayerDataDTO> getPlayerListFromMarket(MarketDTO marketDTO) {
-        List<PlayerDataDTO> playerDataDTOList = new ArrayList<>();
-        marketDTO.getData().getSales().stream().forEach(saleDTO -> {
-            PlayerDataRequestDTO playerDataRequestDTO = saleDTO.getPlayer();
-            PlayerDataDTO playerDataDTO = playerTransformer.transformPlayerRequestToPlayerDTO(playerDataRequestDTO);
-            //playerDataDTO.setOwner(Optional.ofNullable(saleDTO.getUser().getName()));
-            // TODO Refactor Optional getUser()
+    NewsRequestDTO newsRequest = result2.getBody();
+    return newsRequest;
+  }
+
+  private List<PlayerDataDTO> getPlayerListFromMarket(MarketDTO marketDTO) {
+    List<PlayerDataDTO> playerDataDTOList = new ArrayList<>();
+    marketDTO.getData().getSales().stream().forEach(saleDTO -> {
+      PlayerDataRequestDTO playerDataRequestDTO = saleDTO.getPlayer();
+      PlayerDataDTO playerDataDTO = playerTransformer
+          .transformPlayerRequestToPlayerDTO(playerDataRequestDTO);
+      //playerDataDTO.setOwner(Optional.ofNullable(saleDTO.getUser().getName()));
+      // TODO Refactor Optional getUser()
 //            if (saleDTO.getUser()!=null) {
 //                playerDataDTO.setOwner(Optional.ofNullable(saleDTO.getUser().getName()));
 //            } else {
 //                playerDataDTO.setOwner(Optional.empty());
 //            }
-            playerDataDTOList.add(playerDataDTO);});
-        return playerDataDTOList;
-    }
+      playerDataDTOList.add(playerDataDTO);
+    });
+    return playerDataDTOList;
+  }
 }

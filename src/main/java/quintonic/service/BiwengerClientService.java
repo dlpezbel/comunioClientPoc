@@ -7,25 +7,26 @@ import java.util.List;
 import java.util.Map;
 
 public interface BiwengerClientService {
-    PlayerDataDTO getPlayerByName(String playerName);
 
-    TokenDTO login(UserDTO userDTO);
+  PlayerDataDTO getPlayerByName(String playerName);
 
-    List<PlayerDataDTO> getMarketPlayers(String bearer, String league);
+  TokenDTO login(UserDTO userDTO);
 
-    Map getAllPlayers();
+  List<PlayerDataDTO> getMarketPlayers(String bearer, String league);
 
-    List<PlayerDataDTO> getUserPlayers(String bearer, String league);
+  Map getAllPlayers();
 
-    AccountDataDTO getUserAccount(String bearer);
+  List<PlayerDataDTO> getUserPlayers(String bearer, String league);
 
-    List<PlayerDataDTO> getPlayersByName(String name);
+  AccountDataDTO getUserAccount(String bearer);
 
-    OfferDTO setPlayerOffer(String bearer, String league, OfferDTO offer);
+  List<PlayerDataDTO> getPlayersByName(String name);
 
-    List<OfferDTO> getPlayerOffers(String bearer, String league);
+  OfferDTO setPlayerOffer(String bearer, String league, OfferDTO offer);
 
-    Map<String, Integer> getUsersMoney(String bearer, String league, BonusDTO bonus);
+  List<OfferDTO> getPlayerOffers(String bearer, String league);
 
-    void removeOffer(String bearer, String league, String idOffer);
+  Map<String, Integer> getUsersMoney(String bearer, String league, BonusDTO bonus);
+
+  void removeOffer(String bearer, String league, String idOffer);
 }
