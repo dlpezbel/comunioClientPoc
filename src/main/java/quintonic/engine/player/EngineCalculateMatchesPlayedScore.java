@@ -7,7 +7,8 @@ import quintonic.dto.PlayerDataDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalDouble;
+
+import static quintonic.engine.player.EngineGlobalScore.isInteger;
 
 @Component
 public class EngineCalculateMatchesPlayedScore {
@@ -18,15 +19,7 @@ public class EngineCalculateMatchesPlayedScore {
         Optional<List<String>> optionalFitnessList = Optional.ofNullable(playerDataDTO.getFitness());
 
         long lScore = optionalFitnessList.orElse(new ArrayList<>()).stream().filter(
-                s -> {
-                    try{
-                        Integer.parseInt(s);
-                        return true;
-                    }catch(NumberFormatException e){
-                        //not int
-                        return false;
-                    }}
-        ).count();
+                s -> isInteger(s)).count();
         if (lScore == 5) {
             playerDataScored.setMatchesPlayedScore(new Double(1));
         } else if (lScore == 4) {
