@@ -258,13 +258,12 @@ public class BiwengerClientServiceImpl implements BiwengerClientService {
       PlayerDataRequestDTO playerDataRequestDTO = saleDTO.getPlayer();
       PlayerDataDTO playerDataDTO = playerTransformer
           .transformPlayerRequestToPlayerDTO(playerDataRequestDTO);
-      //playerDataDTO.setOwner(Optional.ofNullable(saleDTO.getUser().getName()));
       // TODO Refactor Optional getUser()
-//            if (saleDTO.getUser()!=null) {
-//                playerDataDTO.setOwner(Optional.ofNullable(saleDTO.getUser().getName()));
-//            } else {
-//                playerDataDTO.setOwner(Optional.empty());
-//            }
+            if (saleDTO.getUser()!=null) {
+                playerDataDTO.setOwner(Optional.ofNullable(saleDTO.getUser().getName()));
+            } else {
+                playerDataDTO.setOwner(Optional.empty());
+            }
       playerDataDTOList.add(playerDataDTO);
     });
     return playerDataDTOList;

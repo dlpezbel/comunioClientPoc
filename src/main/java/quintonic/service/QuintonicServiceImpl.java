@@ -48,8 +48,8 @@ public class QuintonicServiceImpl implements QuintonicService {
         filter(playerDataDTO -> leaguePlayers.get(playerDataDTO.getId()) != null).
         map(playerDataDTO -> {
           PlayerDataDTO fullPlayerDataDTO = leaguePlayers.get(playerDataDTO.getId());
-          // TODO set owner
-          //fullPlayerDataDTO.setOwner(playerDataDTO.getOwner());
+          fullPlayerDataDTO.setOwner(playerDataDTO.getOwner());
+          fullPlayerDataDTO.setClause(playerDataDTO.getClause());
           return fullPlayerDataDTO;
         }).map(EngineCalculateAverageFitnessScore::setScore).
         map(EngineCalculateAveragePriceScore::setScore).
