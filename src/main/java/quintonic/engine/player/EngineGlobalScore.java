@@ -1,5 +1,7 @@
 package quintonic.engine.player;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Optional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -16,7 +18,7 @@ public class EngineGlobalScore {
             Optional.ofNullable(playerDataScored.getAveragePriceScore()).orElse(0.0)*1.5 +
             Optional.ofNullable(playerDataScored.getPriceIndicatorScore()).orElse(0.0)*0.5 +
             Optional.ofNullable(playerDataScored.getMatchesPlayedScore()).orElse(0.0))*0.75 / 4;
-    playerDataScored.setScore(finalScore);
+    playerDataScored.setScore(round(finalScore,2));
     return playerDataScored;
   }
 
@@ -101,5 +103,13 @@ public class EngineGlobalScore {
       //not int
       return false;
     }
+  }
+
+  public static double round(double value, int places) {
+    if (places < 0) throw new IllegalArgumentException();
+
+    BigDecimal bd = new BigDecimal(value);
+    bd = bd.setScale(places, RoundingMode.HALF_UP);
+    return bd.doubleValue();
   }
 }
