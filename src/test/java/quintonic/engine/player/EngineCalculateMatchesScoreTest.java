@@ -26,7 +26,7 @@ public class EngineCalculateMatchesScoreTest {
         PlayerDataDTO playerDataDTO = new PlayerDataDTO();
         playerDataDTO.setFitness(Arrays.asList("as","2",null,"0"));
         PlayerDataDTO playerScoredDataDTO = EngineCalculateMatchesPlayedScore.setScore(playerDataDTO);
-        Assert.assertEquals(playerScoredDataDTO.getMatchesPlayedScore(),new Double(0.0));
+        Assert.assertEquals(playerScoredDataDTO.getMatchesPlayedScore(),new Double(0.15));
     }
 
     @Test
@@ -34,7 +34,7 @@ public class EngineCalculateMatchesScoreTest {
         PlayerDataDTO playerDataDTO = new PlayerDataDTO();
         playerDataDTO.setFitness(Arrays.asList("as","2","3","0"));
         PlayerDataDTO playerScoredDataDTO = EngineCalculateMatchesPlayedScore.setScore(playerDataDTO);
-        Assert.assertEquals(playerScoredDataDTO.getMatchesPlayedScore(),new Double(0.0));
+        Assert.assertEquals(playerScoredDataDTO.getMatchesPlayedScore(),new Double(0.55));
     }
 
     @Test
@@ -42,7 +42,7 @@ public class EngineCalculateMatchesScoreTest {
         PlayerDataDTO playerDataDTO = new PlayerDataDTO();
         playerDataDTO.setFitness(Arrays.asList("as","2","3","0","3"));
         PlayerDataDTO playerScoredDataDTO = EngineCalculateMatchesPlayedScore.setScore(playerDataDTO);
-        Assert.assertEquals(playerScoredDataDTO.getMatchesPlayedScore(),new Double(0.75));
+        Assert.assertEquals(playerScoredDataDTO.getMatchesPlayedScore(),new Double(0.85));
     }
 
     @Test

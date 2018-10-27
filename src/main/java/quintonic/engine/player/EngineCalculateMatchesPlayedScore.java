@@ -23,7 +23,11 @@ public class EngineCalculateMatchesPlayedScore {
     if (lScore == 5) {
       playerDataScored.setMatchesPlayedScore(new Double(1));
     } else if (lScore == 4) {
-      playerDataScored.setMatchesPlayedScore(new Double(0.75));
+      playerDataScored.setMatchesPlayedScore(new Double(0.85));
+    } else if (lScore == 3) {
+      playerDataScored.setMatchesPlayedScore(new Double(0.55));
+    } else if (lScore == 2) {
+      playerDataScored.setMatchesPlayedScore(new Double(0.15));
     } else {
       playerDataScored.setMatchesPlayedScore(new Double(0));
     }
